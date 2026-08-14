@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ceniza | Demo FluyLab, 3D real en el navegador</title>
+<meta name="description" content="Demo de FluyLab con 3D real en WebGL: brasas volumétricas que reaccionan al cursor y al scroll, para negocios que quieren verse premium.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0908;
+    --surface:#17130F;
+    --surface-2:#1F1A14;
+    --border:rgba(239,231,221,0.10);
+    --border-strong:rgba(239,231,221,0.20);
+    --bone:#EFE7DD;
+    --bone-muted:rgba(239,231,221,0.62);
+    --bone-faint:rgba(239,231,221,0.38);
+    --ember:#FF5A1F;
+    --ember-soft:rgba(255,90,31,0.14);
+    --radius:4px;
+    --maxw:1280px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);color:var(--bone);
+    font-family:'Outfit',system-ui,sans-serif;
+    line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  h1,h2,h3,.display{
+    font-family:'Cormorant Garamond',serif;
+    font-weight:600;letter-spacing:0;line-height:1.05;
+  }
+  em{font-style:italic;}
+  img{max-width:100%;display:block;}
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px;}
+  section{padding:120px 0;}
+  @media (max-width:768px){section{padding:72px 0;} .wrap{padding:0 20px;}}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:10px;
+    padding:15px 32px;border-radius:999px;font-weight:500;font-size:14.5px;
+    letter-spacing:0.02em;white-space:nowrap;cursor:pointer;border:1px solid transparent;
+    transition:transform .3s cubic-bezier(.16,1,.3,1), background .3s, border-color .3s;
+  }
+  .btn:active{transform:scale(0.97);}
+  .btn-primary{background:var(--ember);color:#0B0908;box-shadow:0 10px 28px rgba(255,90,31,0.28);}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(255,90,31,0.4);}
+  .btn-ghost{background:transparent;color:var(--bone);border-color:var(--border-strong);}
+  .btn-ghost:hover{border-color:var(--ember);color:var(--ember);}
+
+  /* banner */
+  .demo-banner{
+    background:var(--surface-2);border-bottom:1px solid var(--border);
+    text-align:center;padding:11px 20px;font-size:13px;color:var(--bone-muted);
+  }
+  .demo-banner strong{color:var(--ember);font-weight:500;}
+  .demo-banner a{color:var(--bone);text-decoration:underline;text-underline-offset:3px;}
+
+  /* nav */
+  header{position:sticky;top:0;z-index:50;background:rgba(11,9,8,0.7);backdrop-filter:blur(14px) saturate(140%);-webkit-backdrop-filter:blur(14px) saturate(140%);border-bottom:1px solid var(--border);}
+  nav.wrap{height:76px;display:flex;align-items:center;justify-content:space-between;}
+  .logo{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:24px;letter-spacing:0.04em;}
+  .nav-links{display:flex;gap:36px;font-size:14px;color:var(--bone-muted);}
+  .nav-links a:hover{color:var(--bone);}
+  @media (max-width:760px){.nav-links{display:none;}}
+
+  /* hero */
+  .hero{
+    position:relative;min-height:100dvh;display:flex;align-items:flex-end;
+    padding-bottom:80px;padding-top:24px;
+    overflow:hidden;
+  }
+  /* lienzo 3D real (WebGL) del hero */
+  .hero-bg{
+    position:absolute;inset:0;z-index:0;
+    background:
+      radial-gradient(900px 700px at 68% 16%, rgba(255,90,31,.20), transparent 62%),
+      radial-gradient(600px 500px at 20% 88%, rgba(194,60,20,.12), transparent 70%),
+      #0B0908;
+  }
+  .hero-bg canvas{width:100%;height:100%;display:block}
+  .hero-bg::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:
+      linear-gradient(180deg, rgba(11,9,8,0.10) 0%, rgba(11,9,8,0.42) 58%, rgba(11,9,8,0.95) 100%),
+      linear-gradient(90deg, rgba(11,9,8,0.72), transparent 62%);
+  }
+  /* insignia de 3D real */
+  .gl-badge{
+    position:absolute;top:26px;right:26px;z-index:2;
+    display:inline-flex;align-items:center;gap:8px;
+    background:rgba(11,9,8,.62);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    border:1px solid rgba(239,231,221,.18);border-radius:999px;padding:8px 15px;
+    font-size:11.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--bone-muted);
+  }
+  .gl-badge i{width:7px;height:7px;border-radius:50%;background:var(--ember);
+    box-shadow:0 0 10px var(--ember);animation:glpulse 2.2s ease-in-out infinite;font-style:normal}
+  @keyframes glpulse{0%,100%{opacity:1}50%{opacity:.35}}
+  @media (prefers-reduced-motion:reduce){.gl-badge i{animation:none}}
+  @media (max-width:640px){.gl-badge{top:16px;right:16px;font-size:10px;padding:7px 12px}}
+  .hero-content{position:relative;z-index:1;max-width:760px;}
+  .hero-eyebrow{
+    font-size:13px;letter-spacing:0.14em;text-transform:uppercase;color:var(--ember);
+    margin-bottom:20px;font-weight:500;
+  }
+  .hero h1{font-size:clamp(44px,7vw,86px);margin-bottom:22px;}
+  .hero-sub{font-size:18px;color:var(--bone-muted);max-width:46ch;margin-bottom:36px;font-family:'Outfit',sans-serif;}
+  .hero-actions{display:flex;gap:16px;flex-wrap:wrap;}
+
+  .kinetic{opacity:0;transform:translateY(30px);transition:opacity 1s cubic-bezier(.16,1,.3,1), transform 1s cubic-bezier(.16,1,.3,1);}
+  .kinetic.in{opacity:1;transform:translateY(0);}
+  @media (prefers-reduced-motion:reduce){.kinetic{opacity:1;transform:none;transition:none;}}
+
+  /* marquee */
+  .marquee-strip{
+    border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+    padding:26px 0;overflow:hidden;white-space:nowrap;
+  }
+  .marquee-track{display:inline-flex;gap:48px;animation:marquee 34s linear infinite;}
+  .marquee-track span{
+    font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:500;
+    font-size:24px;color:var(--bone-faint);display:inline-flex;align-items:center;gap:48px;
+  }
+  .marquee-track span::after{content:"\2022"; color:var(--ember); font-style:normal;}
+  @keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+  @media (prefers-reduced-motion:reduce){.marquee-track{animation:none;}}
+
+  /* section head */
+  .section-head{max-width:640px;margin-bottom:56px;}
+  .section-eyebrow{font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ember);font-weight:500;margin-bottom:14px;}
+  .section-head h2{font-size:clamp(30px,4vw,48px);}
+
+  /* categorías del menú (bento) */
+  .cat-grid{
+    display:grid;grid-template-columns:repeat(6,1fr);
+    grid-auto-rows:230px;gap:18px;
+  }
+  @media (max-width:1000px){.cat-grid{grid-template-columns:repeat(4,1fr);grid-auto-rows:210px}}
+  @media (max-width:660px){.cat-grid{grid-template-columns:1fr;grid-auto-rows:250px}}
+  /* reparto: 2 grandes arriba, 3 abajo */
+  .cat-a{grid-column:span 4;grid-row:span 2}
+  .cat-b{grid-column:span 2;grid-row:span 1}
+  .cat-c{grid-column:span 2;grid-row:span 1}
+  .cat-d{grid-column:span 3;grid-row:span 1}
+  .cat-e{grid-column:span 3;grid-row:span 1}
+  @media (max-width:1000px){
+    .cat-a{grid-column:span 4;grid-row:span 2}
+    .cat-b,.cat-c{grid-column:span 2}
+    .cat-d,.cat-e{grid-column:span 2}
+  }
+  @media (max-width:660px){
+    .cat-a,.cat-b,.cat-c,.cat-d,.cat-e{grid-column:span 1;grid-row:span 1}
+  }
+
+  .cat{
+    position:relative;overflow:hidden;border-radius:var(--radius);
+    border:1px solid var(--border);background:var(--surface);
+    transition:transform .45s cubic-bezier(.16,1,.3,1),border-color .35s;
+    will-change:transform;display:block;
+  }
+  .cat:hover{border-color:rgba(255,90,31,.42)}
+  .cat-img{position:absolute;inset:0;overflow:hidden}
+  .cat-img img{
+    width:100%;height:100%;object-fit:cover;
+    filter:saturate(1.06) brightness(.78);
+    transition:transform .8s cubic-bezier(.16,1,.3,1),filter .5s;
+  }
+  .cat:hover .cat-img img{transform:scale(1.06);filter:saturate(1.12) brightness(.86)}
+  /* respaldo cuando la foto todavía no está */
+  .cat-img.pending{
+    background:repeating-linear-gradient(135deg,var(--surface) 0 16px,var(--surface-2) 16px 32px);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .cat-img.pending::after{
+    content:attr(data-ph);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--bone-faint);text-align:center;padding:0 20px;
+  }
+  .cat-shade{
+    position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(11,9,8,.05) 0%,rgba(11,9,8,.42) 52%,rgba(11,9,8,.93) 100%);
+  }
+  .cat-body{
+    position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;
+    padding:26px;z-index:1;
+  }
+  .cat-kicker{
+    font-family:'Outfit',sans-serif;font-size:10.5px;font-weight:600;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--ember);margin-bottom:9px;
+  }
+  .cat-name{
+    font-family:'Cormorant Garamond',serif;font-weight:600;line-height:1.05;
+    font-size:clamp(24px,2.6vw,34px);margin-bottom:8px;
+  }
+  .cat-a .cat-name{font-size:clamp(30px,3.6vw,46px)}
+  .cat-desc{font-size:13.6px;color:var(--bone-muted);line-height:1.55;max-width:44ch}
+  .cat-a .cat-desc{font-size:15px;max-width:48ch}
+
+  /* experiencia full width */
+  .experience{
+    position:relative;border-radius:8px;overflow:hidden;
+    min-height:70vh;display:flex;align-items:center;
+  }
+  .experience-bg{position:absolute;inset:0;}
+  .experience-bg img{width:100%;height:100%;object-fit:cover;}
+  .experience-bg::after{content:"";position:absolute;inset:0;background:rgba(11,9,8,0.62);}
+  .experience-content{position:relative;z-index:1;max-width:640px;padding:0 56px;}
+  @media (max-width:768px){.experience-content{padding:0 28px;}}
+  .experience blockquote{
+    font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:500;
+    font-size:clamp(24px,3.4vw,38px);line-height:1.3;margin-bottom:24px;
+  }
+  .experience cite{font-style:normal;font-size:14px;color:var(--bone-muted);}
+
+  /* reservas sobre imagen */
+  .book{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+  .book-bg{position:absolute;inset:0}
+  .book-bg img{width:100%;height:100%;object-fit:cover;filter:brightness(.42) saturate(1.05)}
+  .book-bg.pending{
+    background:
+      radial-gradient(700px 500px at 75% 20%,rgba(255,90,31,.18),transparent 62%),
+      repeating-linear-gradient(135deg,var(--surface) 0 18px,var(--surface-2) 18px 36px);
+  }
+  .book-bg::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(100deg,rgba(11,9,8,.94) 0%,rgba(11,9,8,.78) 46%,rgba(11,9,8,.52) 100%);
+  }
+  .book-inner{
+    position:relative;z-index:1;display:grid;grid-template-columns:1.15fr .85fr;
+    gap:48px;align-items:center;padding:64px 56px;
+  }
+  @media (max-width:900px){.book-inner{grid-template-columns:1fr;gap:36px;padding:44px 30px}}
+  .book-copy h2{font-size:clamp(28px,4vw,46px);margin-bottom:16px;max-width:15ch}
+  .book-copy p{color:var(--bone-muted);font-size:16px;line-height:1.62;margin-bottom:28px;max-width:44ch}
+  .book-fine{font-size:12.8px !important;color:var(--bone-faint) !important;margin:18px 0 0 !important;max-width:40ch}
+
+  .book-facts{
+    display:grid;grid-template-columns:1fr 1fr;gap:1px;
+    background:rgba(239,231,221,.12);border:1px solid rgba(239,231,221,.14);border-radius:8px;overflow:hidden;
+  }
+  @media (max-width:480px){.book-facts{grid-template-columns:1fr}}
+  .fact{background:rgba(11,9,8,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:22px 20px}
+  .fact-k{
+    font-family:'Outfit',sans-serif;font-size:10.5px;font-weight:600;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--ember);margin-bottom:7px;
+  }
+  .fact-v{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--bone);line-height:1.25}
+
+  /* CTA de cierre de FluyLab */
+  .fluy-cta{
+    position:relative;overflow:hidden;text-align:center;border-radius:10px;
+    padding:72px 40px;border:1px solid rgba(255,90,31,.26);
+    background:linear-gradient(150deg,rgba(255,90,31,.10),var(--surface) 58%);
+  }
+  .fluy-mark{
+    font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;letter-spacing:.26em;
+    text-transform:uppercase;color:var(--ember);margin-bottom:18px;
+  }
+  .fluy-cta h2{font-size:clamp(26px,3.8vw,40px);max-width:20ch;margin:0 auto 14px}
+  .fluy-cta p{color:var(--bone-muted);font-size:16px;line-height:1.6;max-width:52ch;margin:0 auto 30px}
+  .fluy-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+  footer{border-top:1px solid var(--border);padding:56px 0;}
+  .footer-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:32px;}
+  @media (max-width:700px){.footer-grid{grid-template-columns:1fr;gap:28px;}}
+  .footer-grid h4{font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:var(--bone-faint);margin-bottom:14px;font-weight:500;}
+  .footer-grid p, .footer-grid a{font-size:14.5px;color:var(--bone-muted);display:block;margin-bottom:6px;}
+  .foot-bottom{margin-top:48px;padding-top:24px;border-top:1px solid var(--border);font-size:12.5px;color:var(--bone-faint);}
+
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1);}
+  .reveal.in{opacity:1;transform:translateY(0);}
+  @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none;}}
+</style>
+</head>
+<body>
+
+<div class="demo-banner">
+  <strong>Demo FluyLab</strong>, 3D real corriendo en tu navegador. Mueve el cursor y haz scroll sobre el fuego. <a href="../../index.html">Volver a la página principal</a>
+</div>
+
+<header>
+  <nav class="wrap">
+    <a href="#top" class="logo">Ceniza</a>
+    <div class="nav-links">
+      <a href="#menu">Menú</a>
+      <a href="#experiencia">Experiencia</a>
+      <a href="#reservas">Reservas</a>
+    </div>
+    <a href="#reservas" class="btn btn-ghost" style="padding:11px 22px;font-size:13.5px;">Reservar mesa</a>
+  </nav>
+</header>
+
+<main id="top">
+
+  <section class="hero">
+    <div class="hero-bg">
+      <canvas id="emberCanvas" aria-hidden="true"></canvas>
+    </div>
+    <div class="gl-badge"><i></i> 3D en vivo, WebGL</div>
+    <div class="wrap">
+      <div class="hero-content">
+        <div class="hero-eyebrow kinetic in">Cocina de fuego abierto</div>
+        <h1 class="kinetic in">Todo lo que servimos <em>pasó por la brasa.</em></h1>
+        <p class="hero-sub kinetic in">Once mesas, una parrilla a la vista y un menú que cambia con la temporada.</p>
+        <div class="hero-actions kinetic in">
+          <a href="#reservas" class="btn btn-primary">Reservar mesa</a>
+          <a href="#menu" class="btn btn-ghost">Ver el menú</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="marquee-strip">
+    <div class="marquee-track">
+      <span>Carnes a la brasa</span>
+      <span>Delicias del mar</span>
+      <span>Cortes de la casa</span>
+      <span>Postres de fuego</span>
+      <span>Bebidas frescas</span>
+      <span>Carnes a la brasa</span>
+      <span>Delicias del mar</span>
+      <span>Cortes de la casa</span>
+      <span>Postres de fuego</span>
+      <span>Bebidas frescas</span>
+    </div>
+  </div>
+
+  <section class="wrap" id="menu">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">La carta</div>
+      <h2>Cinco maneras de pasar por el fuego.</h2>
+      <p style="color:var(--bone-muted);font-size:16px;margin-top:16px;max-width:52ch;">
+        El menú cambia con la temporada y con lo que llegue fresco esa semana. Lo que no cambia es de dónde sale todo: una sola parrilla, a la vista de la mesa.
+      </p>
+    </div>
+
+    <div class="cat-grid reveal">
+      <a href="#reservas" class="cat cat-a">
+        <div class="cat-img">
+          <img src="img/carnes.jpg" alt="Costillas a la brasa" loading="lazy"
+               onerror="this.parentElement.classList.add('pending');this.parentElement.dataset.ph='IMG: costillas a la brasa';this.remove();">
+        </div>
+        <div class="cat-shade"></div>
+        <div class="cat-body">
+          <div class="cat-kicker">Nuestra insignia</div>
+          <div class="cat-name">Carnes a la brasa</div>
+          <p class="cat-desc">Costillas de cocción lenta, cordero a la estaca y piezas que llevan hasta 18 horas sobre leña de naranjo. Se sirven cuando están, no cuando el reloj dice.</p>
+        </div>
+      </a>
+
+      <a href="#reservas" class="cat cat-b">
+        <div class="cat-img">
+          <img src="img/mar.jpg" alt="Pulpo al carbón" loading="lazy"
+               onerror="this.parentElement.classList.add('pending');this.parentElement.dataset.ph='IMG: pulpo al carbón';this.remove();">
+        </div>
+        <div class="cat-shade"></div>
+        <div class="cat-body">
+          <div class="cat-kicker">Del muelle a la brasa</div>
+          <div class="cat-name">Delicias del mar</div>
+          <p class="cat-desc">Pulpo al carbón, pesca del día y mariscos que solo entran si llegaron frescos esa mañana.</p>
+        </div>
+      </a>
+
+      <a href="#reservas" class="cat cat-c">
+        <div class="cat-img">
+          <img src="img/cortes.jpg" alt="Cortes de la casa" loading="lazy"
+               onerror="this.parentElement.classList.add('pending');this.parentElement.dataset.ph='IMG: cortes de la casa';this.remove();">
+        </div>
+        <div class="cat-shade"></div>
+        <div class="cat-body">
+          <div class="cat-kicker">Para compartir</div>
+          <div class="cat-name">Cortes de la casa</div>
+          <p class="cat-desc">Piezas grandes maduradas en casa, pensadas para partir en la mitad de la mesa.</p>
+        </div>
+      </a>
+
+      <a href="#reservas" class="cat cat-d">
+        <div class="cat-img">
+          <img src="img/postres.jpg" alt="Postres de fuego" loading="lazy"
+               onerror="this.parentElement.classList.add('pending');this.parentElement.dataset.ph='IMG: postres de fuego';this.remove();">
+        </div>
+        <div class="cat-shade"></div>
+        <div class="cat-body">
+          <div class="cat-kicker">El cierre</div>
+          <div class="cat-name">Postres de fuego</div>
+          <p class="cat-desc">Cítricos flameados frente a ti, caramelo hecho al momento y helado que se derrite mientras llega. El único plato que se termina en la mesa.</p>
+        </div>
+      </a>
+
+      <a href="#reservas" class="cat cat-e">
+        <div class="cat-img">
+          <img src="img/bebidas.jpg" alt="Bebidas frescas" loading="lazy"
+               onerror="this.parentElement.classList.add('pending');this.parentElement.dataset.ph='IMG: bebidas frescas';this.remove();">
+        </div>
+        <div class="cat-shade"></div>
+        <div class="cat-body">
+          <div class="cat-kicker">Para bajar el humo</div>
+          <div class="cat-name">Bebidas frescas</div>
+          <p class="cat-desc">Limonadas de la casa, fermentados propios y una carta corta de vinos que aguantan la brasa.</p>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section class="wrap" id="experiencia">
+    <div class="experience reveal">
+      <div class="experience-bg">
+        <img src="img/salon.jpg" alt="Salón del restaurante Ceniza"
+             onerror="this.style.display='none';">
+      </div>
+      <div class="experience-content">
+        <blockquote>"No hay carta digital ni pantallas. Solo una mesa, fuego y tiempo."</blockquote>
+        <cite>Filosofía de cocina, Ceniza</cite>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap" id="reservas">
+    <div class="book reveal">
+      <div class="book-bg">
+        <img src="img/salon.jpg" alt="Salón del restaurante Ceniza" loading="lazy"
+             onerror="this.parentElement.classList.add('pending');this.remove();">
+      </div>
+      <div class="book-inner">
+        <div class="book-copy">
+          <div class="section-eyebrow">Reservas</div>
+          <h2>Once mesas por noche. Nada más.</h2>
+          <p>La parrilla marca el ritmo, no la cantidad de comensales. Por eso el salón no crece y las noches de fin de semana se llenan con semanas de anticipación.</p>
+          <a href="#" class="btn btn-primary">Reservar mi mesa</a>
+          <p class="book-fine">Confirmación inmediata por WhatsApp. Grupos de más de 6 personas, escríbenos directo.</p>
+        </div>
+        <div class="book-facts">
+          <div class="fact">
+            <div class="fact-k">Días</div>
+            <div class="fact-v">Martes a domingo</div>
+          </div>
+          <div class="fact">
+            <div class="fact-k">Horario</div>
+            <div class="fact-v">6:00pm a 11:00pm</div>
+          </div>
+          <div class="fact">
+            <div class="fact-k">Capacidad</div>
+            <div class="fact-v">11 mesas por turno</div>
+          </div>
+          <div class="fact">
+            <div class="fact-k">Dónde</div>
+            <div class="fact-v">Bucaramanga, Santander</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA de FluyLab, cierre de la demo -->
+  <section class="wrap" id="cotiza">
+    <div class="fluy-cta reveal">
+      <div class="fluy-mark">FluyLab</div>
+      <h2>¿Te gustó cómo se ve esta página?</h2>
+      <p>Esto es una demo, pero la tuya puede verse así. Escríbenos y te cotizamos la página web de tu negocio, con el mismo nivel de acabado.</p>
+      <div class="fluy-actions">
+        <a href="../../web.html" class="btn btn-primary">Cotizar mi página web</a>
+        <a href="../../index.html" class="btn btn-ghost">Ver todo lo que hacemos</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <h4>Ceniza</h4>
+        <p style="color:var(--bone);font-family:'Cormorant Garamond',serif;font-size:20px;">Cocina de fuego abierto</p>
+      </div>
+      <div>
+        <h4>Horario</h4>
+        <p>Martes a domingo</p>
+        <p>6:00pm a 11:00pm</p>
+      </div>
+      <div>
+        <h4>Reservas</h4>
+        <a href="#reservas">Reservar mesa</a>
+        <a href="#menu">Ver el menú</a>
+      </div>
+    </div>
+    <div class="foot-bottom wrap" style="padding:0;">Demo construida por FluyLab para mostrar el estilo Alto Impacto. Este no es un restaurante real.</div>
+  </div>
+</footer>
+
+<script>
+  // reveal on scroll
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    // inclinación 3D suave en las tarjetas de categoría
+    document.querySelectorAll('.cat').forEach(card => {
+      card.addEventListener('pointermove', (e) => {
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5;
+        const y = (e.clientY - r.top) / r.height - 0.5;
+        card.style.transform = `perspective(1200px) rotateY(${x * 3.4}deg) rotateX(${-y * 3.4}deg) translateY(-3px)`;
+      }, { passive: true });
+      card.addEventListener('pointerleave', () => { card.style.transform = ''; });
+    });
+  } else {
+    document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+  }
+</script>
+
+<!-- ============ 3D real: Three.js (WebGL) ============ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+  var canvas = document.getElementById('emberCanvas');
+  var badge = document.querySelector('.gl-badge');
+
+  // si no hay WebGL o no cargó la librería, se cae con elegancia al degradado
+  function bail() {
+    if (canvas) canvas.style.display = 'none';
+    if (badge) badge.style.display = 'none';
+  }
+
+  if (!canvas || typeof THREE === 'undefined') { bail(); return; }
+
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+  } catch (err) {
+    bail();
+    return;
+  }
+
+  var host = canvas.parentElement;
+  var W = host.clientWidth, H = host.clientHeight;
+
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(W, H, false);
+  renderer.setClearColor(0x000000, 0);
+
+  var scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x0B0908, 0.055);
+
+  var camera = new THREE.PerspectiveCamera(58, W / H, 0.1, 120);
+  camera.position.set(0, 1.2, 16);
+
+  var root = new THREE.Group();
+  scene.add(root);
+
+  /* ---------- 1. campo volumétrico de brasas ---------- */
+  var COUNT = 1400;
+  var positions = new Float32Array(COUNT * 3);
+  var colors = new Float32Array(COUNT * 3);
+  var sizes = new Float32Array(COUNT);
+  var speeds = new Float32Array(COUNT);
+  var sway = new Float32Array(COUNT);
+
+  var cHot = new THREE.Color(0xFF8A3D);
+  var cMid = new THREE.Color(0xFF5A1F);
+  var cAsh = new THREE.Color(0x8A5A3C);
+
+  for (var i = 0; i < COUNT; i++) {
+    positions[i * 3]     = (Math.random() - 0.5) * 44;
+    positions[i * 3 + 1] = (Math.random() - 0.5) * 34;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * 30 - 4;
+
+    var t = Math.random();
+    var col = t > 0.72 ? cHot : (t > 0.3 ? cMid : cAsh);
+    colors[i * 3]     = col.r;
+    colors[i * 3 + 1] = col.g;
+    colors[i * 3 + 2] = col.b;
+
+    sizes[i]  = 0.06 + Math.random() * 0.22;
+    speeds[i] = 0.6 + Math.random() * 1.9;
+    sway[i]   = Math.random() * Math.PI * 2;
+  }
+
+  var emberGeo = new THREE.BufferGeometry();
+  emberGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  emberGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  emberGeo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+  // sprite radial generado en canvas, sin archivos externos
+  var spriteCv = document.createElement('canvas');
+  spriteCv.width = spriteCv.height = 64;
+  var sctx = spriteCv.getContext('2d');
+  var grad = sctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+  grad.addColorStop(0.0, 'rgba(255,255,255,1)');
+  grad.addColorStop(0.25, 'rgba(255,190,120,0.85)');
+  grad.addColorStop(0.6, 'rgba(255,90,31,0.28)');
+  grad.addColorStop(1.0, 'rgba(255,90,31,0)');
+  sctx.fillStyle = grad;
+  sctx.fillRect(0, 0, 64, 64);
+  var sprite = new THREE.CanvasTexture(spriteCv);
+
+  var emberMat = new THREE.ShaderMaterial({
+    uniforms: { uTex: { value: sprite }, uScale: { value: H * 0.5 } },
+    vertexShader: [
+      'attribute float size;',
+      'varying vec3 vCol;',
+      'uniform float uScale;',
+      'void main(){',
+      '  vCol = color;',
+      '  vec4 mv = modelViewMatrix * vec4(position,1.0);',
+      '  gl_PointSize = size * uScale / max(-mv.z, 0.001);',
+      '  gl_Position = projectionMatrix * mv;',
+      '}'
+    ].join('\n'),
+    fragmentShader: [
+      'uniform sampler2D uTex;',
+      'varying vec3 vCol;',
+      'void main(){',
+      '  vec4 t = texture2D(uTex, gl_PointCoord);',
+      '  if (t.a < 0.02) discard;',
+      '  gl_FragColor = vec4(vCol, 1.0) * t;',
+      '}'
+    ].join('\n'),
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    vertexColors: true
+  });
+
+  var embers = new THREE.Points(emberGeo, emberMat);
+  root.add(embers);
+
+  /* ---------- 2. malla de humo/calor en 3D ---------- */
+  var smokeGeo = new THREE.IcosahedronGeometry(7.2, 3);
+  var smokeMat = new THREE.MeshBasicMaterial({
+    color: 0xFF5A1F, wireframe: true, transparent: true, opacity: 0.075
+  });
+  var smoke = new THREE.Mesh(smokeGeo, smokeMat);
+  smoke.position.set(3.5, 0.5, -6);
+  root.add(smoke);
+
+  var smoke2 = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(11.5, 2),
+    new THREE.MeshBasicMaterial({ color: 0xC23C14, wireframe: true, transparent: true, opacity: 0.045 })
+  );
+  smoke2.position.set(-5, -1, -12);
+  root.add(smoke2);
+
+  /* ---------- interacción ---------- */
+  var mx = 0, my = 0, tmx = 0, tmy = 0, scrollN = 0;
+
+  if (!reduce) {
+    window.addEventListener('pointermove', function (e) {
+      tmx = (e.clientX / window.innerWidth - 0.5) * 2;
+      tmy = (e.clientY / window.innerHeight - 0.5) * 2;
+    }, { passive: true });
+
+    window.addEventListener('scroll', function () {
+      scrollN = Math.min(window.scrollY / (window.innerHeight || 1), 1);
+    }, { passive: true });
+  }
+
+  function resize() {
+    W = host.clientWidth; H = host.clientHeight;
+    if (!W || !H) return;
+    camera.aspect = W / H;
+    camera.updateProjectionMatrix();
+    renderer.setSize(W, H, false);
+    emberMat.uniforms.uScale.value = H * 0.5;
+  }
+  window.addEventListener('resize', resize, { passive: true });
+
+  var pos = emberGeo.attributes.position.array;
+  var clock = new THREE.Clock();
+  var running = true;
+
+  // pausa el render cuando el hero sale de pantalla (no gasta GPU de más)
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      running = entries[0].isIntersecting;
+    }, { threshold: 0.01 }).observe(host);
+  }
+
+  function frame() {
+    requestAnimationFrame(frame);
+    if (!running) return;
+
+    var dt = Math.min(clock.getDelta(), 0.05);
+    var t = clock.elapsedTime;
+
+    if (!reduce) {
+      // las brasas suben y ondulan, y reaparecen abajo
+      for (var i = 0; i < COUNT; i++) {
+        var iy = i * 3 + 1;
+        pos[iy] += speeds[i] * dt * 0.9;
+        pos[i * 3] += Math.sin(t * 0.7 + sway[i]) * dt * 0.28;
+        if (pos[iy] > 18) {
+          pos[iy] = -18;
+          pos[i * 3] = (Math.random() - 0.5) * 44;
+          pos[i * 3 + 2] = (Math.random() - 0.5) * 30 - 4;
+        }
+      }
+      emberGeo.attributes.position.needsUpdate = true;
+
+      smoke.rotation.y += dt * 0.06;
+      smoke.rotation.x += dt * 0.025;
+      smoke2.rotation.y -= dt * 0.04;
+
+      // parallax suave del cursor
+      mx += (tmx - mx) * 0.045;
+      my += (tmy - my) * 0.045;
+      camera.position.x = mx * 2.4;
+      camera.position.y = 1.2 - my * 1.5;
+
+      // el scroll empuja la cámara hacia adentro del fuego
+      camera.position.z = 16 - scrollN * 5.5;
+      root.rotation.z = mx * 0.05;
+    }
+
+    camera.lookAt(0, 0, -4);
+    renderer.render(scene, camera);
+  }
+
+  resize();
+  frame();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Software a medida para tu negocio | FluyLab</title>
+<meta name="description" content="El sistema que se adapta a cómo trabaja tu negocio: agenda, inventario, personal, nómina y automatizaciones. Desde $3.500.000 COP. Diagnóstico gratis.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Cormorant+Garamond:ital,wght@1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/fluylab.css">
+<style>
+.hero-sw{display:grid;grid-template-columns:1.06fr .94fr;gap:56px;align-items:center}
+@media(max-width:940px){.hero-sw{grid-template-columns:1fr;gap:44px}}
+
+/* panel de sistema simulado */
+.panel{border-radius:16px;overflow:hidden;border:1px solid var(--line);background:var(--surface);
+  box-shadow:0 30px 90px rgba(0,0,0,.5)}
+.panel-bar{height:36px;display:flex;align-items:center;gap:8px;padding:0 14px;
+  background:var(--s3);border-bottom:1px solid var(--line)}
+.panel-dot{width:8px;height:8px;border-radius:50%;background:var(--cream4)}
+.panel-title{margin-left:8px;font-family:var(--font-d);font-size:11.5px;color:var(--cream3);font-weight:500}
+.panel-body{padding:20px;display:grid;gap:14px}
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.kpi{background:var(--s2);border:1px solid var(--line);border-radius:11px;padding:14px 13px}
+.kpi-l{font-size:10px;color:var(--cream4);letter-spacing:.09em;text-transform:uppercase;font-family:var(--font-d);font-weight:600}
+.kpi-v{font-family:var(--font-d);font-weight:700;font-size:19px;color:var(--cream);margin-top:5px;font-variant-numeric:tabular-nums}
+.kpi-v.up{color:var(--orange)}
+.rows{background:var(--s2);border:1px solid var(--line);border-radius:11px;overflow:hidden}
+.row-i{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--line2);font-size:12.5px;color:var(--cream2)}
+.row-i:first-child{border-top:none}
+.row-tick{width:20px;height:20px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  background:var(--og-faint);border:1px solid rgba(255,106,0,.24)}
+.row-i span.tag{margin-left:auto;font-family:var(--font-d);font-size:10px;font-weight:700;
+  padding:3px 9px;border-radius:6px;background:rgba(95,174,130,.13);color:var(--green);letter-spacing:.04em}
+.row-i span.tag.wait{background:rgba(255,106,0,.12);color:var(--orange)}
+.bar-track{height:4px;background:rgba(243,237,228,.07);border-radius:99px;overflow:hidden;margin-top:9px}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--orange),var(--orange2));border-radius:99px;
+  width:0;transition:width 1.9s var(--ease)}
+
+/* indicador "en vivo" del panel */
+.panel-live{margin-left:auto;display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--font-d);font-size:10px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--cream4)}
+.panel-live i{width:6px;height:6px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 8px rgba(95,174,130,.9);animation:livePulse 2s ease-in-out infinite;font-style:normal}
+@keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.82)}}
+
+/* las filas entran una por una, como si el sistema fuera resolviendo */
+.row-i{opacity:0;transform:translateX(-10px);
+  transition:opacity .55s var(--ease),transform .55s var(--ease)}
+.row-i.on{opacity:1;transform:none}
+.row-tick{transform:scale(.4);opacity:0;transition:transform .5s var(--ease) .12s,opacity .4s .12s}
+.row-i.on .row-tick{transform:scale(1);opacity:1}
+.row-i .tag{opacity:0;transform:translateX(8px);
+  transition:opacity .5s var(--ease) .28s,transform .5s var(--ease) .28s}
+.row-i.on .tag{opacity:1;transform:none}
+
+@media(prefers-reduced-motion:reduce){
+  .panel-live i{animation:none}
+  .row-i,.row-tick,.row-i .tag{opacity:1;transform:none;transition:none}
+  .bar-fill{transition:none}
+}
+
+/* costo oculto */
+.cost-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2px;
+  border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.cost{background:var(--surface);padding:32px 28px;transition:background .3s}
+.cost:hover{background:var(--s2)}
+.cost-h{font-family:var(--font-d);font-weight:700;font-size:15px;color:var(--cream);margin-bottom:10px;
+  display:flex;align-items:center;gap:9px}
+.cost-h svg{color:var(--orange);flex-shrink:0}
+.cost p{font-size:13.8px;color:var(--cream3);line-height:1.62}
+
+/* módulos */
+.mods{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:940px){.mods{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.mods{grid-template-columns:1fr}}
+.mod{padding:28px 26px}
+.mod-ico{width:42px;height:42px;border-radius:12px;background:var(--og-faint);
+  border:1px solid rgba(255,106,0,.2);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.mod-ico svg{color:var(--orange)}
+.mod h4{font-size:16.5px;margin-bottom:8px}
+.mod p{font-size:13.6px;color:var(--cream3);line-height:1.6}
+
+/* verticales tabs */
+.vtabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px}
+.vtab{font-family:var(--font-d);font-weight:600;font-size:13.5px;color:var(--cream3);
+  background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:11px 20px;cursor:pointer;
+  transition:all .3s var(--ease)}
+.vtab:hover{color:var(--cream);border-color:var(--cream4)}
+.vtab.on{background:rgba(255,106,0,.13);border-color:var(--orange);color:var(--orange)}
+.vpane{display:none;border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.vpane.on{display:block}
+.vpane-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--line)}
+@media(max-width:768px){.vpane-grid{grid-template-columns:1fr}}
+.vpane-item{background:var(--surface);padding:22px 24px;display:flex;gap:12px;align-items:flex-start}
+.vpane-item svg{color:var(--orange);flex-shrink:0;margin-top:3px}
+.vpane-item b{display:block;font-family:var(--font-d);font-weight:600;font-size:14.5px;color:var(--cream);margin-bottom:4px}
+.vpane-item p{font-size:13.2px;color:var(--cream3);line-height:1.55}
+
+/* proceso */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;
+  border:1px solid var(--line);border-radius:18px;overflow:hidden}
+@media(max-width:900px){.steps{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.steps{grid-template-columns:1fr}}
+.step-c{background:var(--surface);padding:28px 24px}
+.step-c .n{font-family:var(--font-d);font-weight:700;font-size:12px;color:var(--orange);
+  letter-spacing:.14em;margin-bottom:14px}
+.step-c h4{font-size:15.5px;margin-bottom:8px}
+.step-c p{font-size:13.3px;color:var(--cream3);line-height:1.55}
+
+/* precio */
+.price-box{display:grid;grid-template-columns:1.1fr .9fr;gap:34px;align-items:center;
+  padding:44px 40px;border-radius:22px;
+  background:linear-gradient(135deg,rgba(255,106,0,.09),var(--surface) 60%);
+  border:1px solid rgba(255,106,0,.28)}
+@media(max-width:820px){.price-box{grid-template-columns:1fr;gap:28px}}
+.price-big{font-family:var(--font-d);font-weight:700;font-size:clamp(34px,5vw,52px);color:var(--cream);line-height:1}
+.price-note{font-size:14px;color:var(--cream3);margin-top:14px;line-height:1.6;max-width:46ch}
+.price-plan{font-size:15px;color:var(--cream3);margin-top:16px;line-height:1.55}
+.price-plan b{color:var(--cream);font-family:var(--font-d);font-weight:600}
+</style>
+</head>
+<body>
+
+<nav class="topnav" id="topnav">
+  <a href="index.html" class="brand"><span class="brand-mark">F</span>FluyLab</a>
+  <div class="navlinks">
+    <a href="web.html">Página web</a>
+    <a href="software.html" class="on">Software</a>
+    <a href="marketing.html">Marketing</a>
+    <a href="#precio">Precio</a>
+  </div>
+  <a href="#contacto" class="btn btn-p" style="padding:11px 20px;font-size:13.5px">Diagnóstico gratis</a>
+</nav>
+
+<main id="top">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-glow"></div>
+    <div class="dotfield"></div>
+    <div class="orb orb1"></div>
+    <div class="wrap">
+      <div class="hero-sw">
+        <div>
+          <div class="eye rv">Puerta 2 · Software a medida</div>
+          <h1 class="rv d1">Lo que hoy haces a mano, <span class="gr">el sistema lo hace solo</span>.</h1>
+          <p class="lead rv d2">Un software construido sobre tu operación real, no una plantilla donde tú te tienes que acomodar. Agenda, inventario, personal y plata, en un solo lugar y hablándose entre sí.</p>
+          <div class="hero-actions rv d3">
+            <a href="#contacto" class="btn btn-p btn-pulse">Pide tu diagnóstico</a>
+            <a href="#modulos" class="btn btn-g">Ver los módulos</a>
+          </div>
+        </div>
+        <div class="rv d2">
+          <div class="panel" id="livePanel">
+            <div class="panel-bar">
+              <span class="panel-dot"></span><span class="panel-dot"></span><span class="panel-dot"></span>
+              <span class="panel-title">Tu sistema · resumen de hoy</span>
+              <span class="panel-live"><i></i> En vivo</span>
+            </div>
+            <div class="panel-body">
+              <div class="kpi-row">
+                <div class="kpi"><div class="kpi-l">Citas hoy</div><div class="kpi-v" data-n="14">0</div></div>
+                <div class="kpi"><div class="kpi-l">Confirmadas</div><div class="kpi-v up" data-n="12">0</div></div>
+                <div class="kpi"><div class="kpi-l">Sin stock</div><div class="kpi-v" data-n="3">0</div></div>
+              </div>
+              <div class="rows">
+                <div class="row-i" data-step>
+                  <span class="row-tick"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FF6A00" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></span>
+                  Recordatorios enviados
+                  <span class="tag">Automático</span>
+                </div>
+                <div class="row-i" data-step>
+                  <span class="row-tick"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FF6A00" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></span>
+                  Cierre de caja del día
+                  <span class="tag">Automático</span>
+                </div>
+                <div class="row-i" data-step>
+                  <span class="row-tick"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FF6A00" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></span>
+                  Alerta de inventario bajo
+                  <span class="tag wait">Requiere ti</span>
+                </div>
+              </div>
+              <div class="kpi" style="background:var(--s2)">
+                <div class="kpi-l">Horas manuales ahorradas esta semana</div>
+                <div class="kpi-v up"><span data-hours="11.5">0,0</span> h</div>
+                <div class="bar-track"><div class="bar-fill" id="hoursBar"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="divider"></div>
+
+  <!-- COSTO OCULTO -->
+  <section>
+    <div class="wrap">
+      <div class="sec-head rv">
+        <div class="eye">El costo que no ves</div>
+        <h2 class="sec-h">"Yo eso ya lo hago" también tiene precio.</h2>
+        <p class="sec-sub">Nadie te cobra una factura por hacerlo a mano, pero lo estás pagando igual. Solo que lo pagas en tiempo, en errores y en cosas que se te pasan.</p>
+      </div>
+      <div class="cost-grid rv d1">
+        <div class="cost">
+          <div class="cost-h">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            Tu tiempo, el más caro
+          </div>
+          <p>Confirmar citas una por una, pasar ventas a un Excel, cuadrar turnos a mano. Horas de la persona que debería estar haciendo crecer el negocio.</p>
+        </div>
+        <div class="cost">
+          <div class="cost-h">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></svg>
+            Errores que salen caros
+          </div>
+          <p>Un pedido mal tomado, un inventario descuadrado, una hora extra que no se pagó bien. Cada uno cuesta plata o cuesta un cliente.</p>
+        </div>
+        <div class="cost">
+          <div class="cost-h">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+            Decisiones a ciegas
+          </div>
+          <p>Sin números claros no sabes qué producto deja plata, qué día rinde más ni cuánto te cuesta realmente atender a un cliente.</p>
+        </div>
+        <div class="cost">
+          <div class="cost-h">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11z"/></svg>
+            Todo depende de una persona
+          </div>
+          <p>Si esa persona se enferma o se va, se va con la información en la cabeza. El negocio no debería depender de una memoria.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- MÓDULOS -->
+  <section id="modulos">
+    <div class="orb orb3"></div>
+    <div class="wrap">
+      <div class="sec-head rv">
+        <div class="eye">Qué puede tener tu sistema</div>
+        <h2 class="sec-h">Módulos que se arman según tu operación.</h2>
+        <p class="sec-sub">No compras todo. Se arma con lo que tu negocio de verdad necesita y se le agregan piezas cuando llegue el momento.</p>
+      </div>
+      <div class="mods">
+        <div class="card mod rv d1">
+          <div class="card-glow"></div>
+          <div class="mod-ico"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+          <h4>Agenda y citas</h4>
+          <p>Reservas, recordatorios automáticos por WhatsApp, control de disponibilidad y confirmaciones sin que tengas que escribir una por una.</p>
+        </div>
+        <div class="card mod rv d2">
+          <div class="card-glow"></div>
+          <div class="mod-ico"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 8V5a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v3"/><path d="M3 8h18v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M10 12h4"/></svg></div>
+          <h4>Inventario</h4>
+          <p>Stock en tiempo real, alertas antes de quedarte sin producto, control por lote o por talla y bloqueo de venta cuando no hay existencias.</p>
+        </div>
+        <div class="card mod rv d3">
+          <div class="card-glow"></div>
+          <div class="mod-ico"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg></div>
+          <h4>Personal y nómina</h4>
+          <p>Turnos, horas trabajadas, horas extra, recargos y todo lo de ley. Se calcula solo y queda registrado, sin cuadrar nada a mano.</p>
+        </div>
+        <div class="card mod rv d1">
+          <div class="card-glow"></div>
+          <div class="mod-ico"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V5a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M14 3v5h5M8 13h8M8 17h5"/></svg></div>
+          <h4>Historial de clientes</h4>
+          <p>Todo lo de cada cliente en un solo lugar y con trazabilidad. Historia clínica, pedidos anteriores o servicios, según tu negocio.</p>
+        </div>
+        <div class="card mod rv d2">
+          <div class="card-glow"></div>
+          <div class="mod-ico"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 15v-4M12 15V7M17 15v-6"/></svg></div>
+          <h4>Reportes que se entienden</h4>
+          <p>Cuánto entró, cuánto salió, qué se movió y qué no. Sin tablas imposibles: la información que necesitas para decidir.</p>
+        </div>
+        <div class="card mod rv d3">
+          <div class="card-glow"></div>
+          <div class="mod-ico"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg></div>
+          <h4>Automatizaciones</h4>
+          <p>Recordatorios, cierres de caja, alertas, reportes que llegan solos. Todo lo repetitivo pasa de tus manos a las del sistema.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- VERTICALES -->
+  <section>
+    <div class="wrap">
+      <div class="sec-head rv">
+        <div class="eye">Se arma distinto para cada negocio</div>
+        <h2 class="sec-h">Un restaurante no necesita lo mismo que un consultorio.</h2>
+        <p class="sec-sub">Mira cómo cambia el sistema según el negocio. Si el tuyo no está aquí, con más razón hablemos.</p>
+      </div>
+      <div class="rv d1">
+        <div class="vtabs" id="vtabs">
+          <button class="vtab on" data-v="rest">Restaurante</button>
+          <button class="vtab" data-v="cons">Consultorio</button>
+          <button class="vtab" data-v="tienda">Tienda o marca</button>
+        </div>
+
+        <div class="vpane on" data-p="rest">
+          <div class="vpane-grid">
+            <div class="vpane-item"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg><div><b>Reservas y mesas</b><p>Asignación automática según tamaño de grupo y disponibilidad real del salón.</p></div></div>
+            <div class="vpane-item"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg><div><b>Inventario de cocina</b><p>Descuenta insumos por plato vendido y avisa antes de que se acabe algo.</p></div></div>
+            <div class="vpane-item"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg><div><b>Domicilios</b><p>Pedidos que entran, se despachan y se cobran sin pasar por un cuaderno.</p></div></div>
+            <div class="vpane-item"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg><div><b>Turnos y nómina</b><p>Horas del personal, extras y recargos calculados solos, listos para pagar.</p></div></div>
+          </div>
+        </div>
+
+        <div class="vpane" data-p="cons">
+          <div class="vpane-grid">
+            <div class="vpane-item"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg><div><b>Historia clínica</b><p>Organizada, con trazabilidad y lista para entregar cuando la pidan.</p></div></div>
+            <div class="vpane-item"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg><div><b>Agendamiento profundo</b><p>Por tipo de procedimiento, duración real y disponibilidad de cada profesional.</p></div></div>
+            <div class="vpane-item"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg><div><b>Portal del paciente</b><p>Entra, ve y descarga lo suyo. Tú dejas de buscar documentos a mano.</p></div></div>
+            <div class="vpane-item"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg><div><b>Turnos y nómina</b><p>Control del equipo, horas y pagos sin depender de una hoja de cálculo.</p></div></div>
+          </div>
+        </div>
+
+        <div class="vpane" data-p="tienda">
+          <div class="vpane-grid">
+            <div class="vpane-item"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg><div><b>Inventario por talla y lote</b><p>Sabes exactamente qué queda de cada referencia y en qué variante.</p></div></div>
+            <div class="vpane-item"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg><div><b>Pedidos y envíos</b><p>Del carrito a la guía de envío, con seguimiento para el cliente.</p></div></div>
+            <div class="vpane-item"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg><div><b>Conectado a tu web</b><p>El catálogo de la tienda y el del sistema son el mismo, sin duplicar trabajo.</p></div></div>
+            <div class="vpane-item"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg><div><b>Reportes de temporada</b><p>Qué se vendió, qué sobró y con qué margen, por colección o por lote.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PROCESO -->
+  <section>
+    <div class="wrap">
+      <div class="sec-head rv">
+        <div class="eye">Cómo trabajamos</div>
+        <h2 class="sec-h">Nadie construye nada antes de entender tu operación.</h2>
+      </div>
+      <div class="steps rv d1">
+        <div class="step-c">
+          <div class="n">PASO 01</div>
+          <h4>Te escuchamos</h4>
+          <p>Recorremos cómo funciona tu día a día y dónde se te va el tiempo de verdad.</p>
+        </div>
+        <div class="step-c">
+          <div class="n">PASO 02</div>
+          <h4>Diseñamos el sistema</h4>
+          <p>Definimos qué módulos necesitas, en qué orden y qué se automatiza primero.</p>
+        </div>
+        <div class="step-c">
+          <div class="n">PASO 03</div>
+          <h4>Construimos por partes</h4>
+          <p>Entregamos funcionando por etapas, no un año después. Ves avances reales.</p>
+        </div>
+        <div class="step-c">
+          <div class="n">PASO 04</div>
+          <h4>Acompañamos</h4>
+          <p>Capacitación de tu equipo, ajustes y soporte. El sistema evoluciona contigo.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PRECIO -->
+  <section id="precio">
+    <div class="wrap">
+      <div class="sec-head rv">
+        <div class="eye">Inversión</div>
+        <h2 class="sec-h">Depende de tu operación, pero no de un misterio.</h2>
+      </div>
+      <div class="price-box rv d1">
+        <div>
+          <div class="price-from">Desde</div>
+          <div class="price-big">$3.500.000 <span style="font-size:16px;font-weight:500;color:var(--cream3)">COP</span></div>
+          <div class="price-plan">Soporte e infraestructura <b>$200.000/mes</b> o <b>$2.500.000/año</b></div>
+          <p class="price-note">El valor de construcción depende de cuántos módulos necesites y qué tan profunda sea la automatización. La mensualidad de soporte cubre servidor, respaldos, actualizaciones y atención directa.</p>
+        </div>
+        <div>
+          <ul class="checks" style="margin-bottom:24px">
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Diagnóstico y diseño del sistema sin costo</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Entrega por etapas funcionando</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Capacitación de tu equipo incluida</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Descuento si lo combinas con web o marketing</li>
+          </ul>
+          <a href="#contacto" class="btn btn-p btn-pulse">Hablemos de tu caso</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="contacto">
+    <div class="wrap">
+      <div class="cta-card rv card">
+        <div class="card-glow"></div>
+        <div class="art3d" aria-hidden="true">
+          <div class="a-stack">
+            <div class="a-plane q3"></div>
+            <div class="a-plane q2"></div>
+            <div class="a-plane q1"></div>
+          </div>
+          <div class="a-spark"></div>
+        </div>
+        <h2>Cuéntanos qué es lo que más tiempo te quita hoy.</h2>
+        <p>Con eso ya podemos decirte si un sistema te sirve, qué módulos necesitarías y por dónde empezaríamos. Sin costo y sin compromiso.</p>
+        <a href="https://wa.me/57XXXXXXXXXX?text=Hola%2C%20quiero%20hablar%20de%20un%20software%20a%20medida" class="btn btn-p btn-pulse">Escribir por WhatsApp</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand" style="margin-bottom:12px"><span class="brand-mark">F</span>FluyLab</div>
+        <p style="max-width:30ch">Sistemas que trabajan. Personas que avanzan.</p>
+      </div>
+      <div>
+        <h4>Servicios</h4>
+        <a href="web.html">Página web</a>
+        <a href="software.html">Software a medida</a>
+        <a href="marketing.html">Marketing orgánico</a>
+      </div>
+      <div>
+        <h4>Demos</h4>
+        <a href="demos/alma/index.html">Alma, modo noche</a>
+        <a href="demos/alma-b/index.html">Alma, modo día</a>
+        <a href="demos/ceniza/index.html">Ceniza, 3D</a>
+      </div>
+      <div>
+        <h4>Contacto</h4>
+        <a href="#contacto">WhatsApp</a>
+        <a href="index.html">Volver al inicio</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>FluyLab, Bucaramanga.</span>
+      <span>Los precios mostrados son valores desde, sujetos al alcance de cada proyecto.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/fluylab.js"></script>
+<script>
+/* ===== panel vivo del hero =====
+   Se dispara al entrar en pantalla y vuelve a correr cada cierto tiempo,
+   para que el panel se sienta un sistema trabajando y no una captura. */
+(function(){
+  var panel=document.getElementById('livePanel');
+  if(!panel)return;
+  var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var nums=panel.querySelectorAll('[data-n]');
+  var hours=panel.querySelector('[data-hours]');
+  var rows=panel.querySelectorAll('[data-step]');
+  var bar=document.getElementById('hoursBar');
+
+  if(reduce){
+    nums.forEach(function(el){el.textContent=el.dataset.n;});
+    if(hours)hours.textContent='11,5';
+    rows.forEach(function(r){r.classList.add('on');});
+    if(bar)bar.style.width='78%';
+    return;
+  }
+
+  function countTo(el,target,dur,decimals){
+    var start=null;
+    function step(ts){
+      if(!start)start=ts;
+      var p=Math.min((ts-start)/dur,1);
+      var eased=1-Math.pow(1-p,3);
+      var val=eased*target;
+      el.textContent=decimals
+        ? val.toFixed(1).replace('.',',')
+        : Math.round(val);
+      if(p<1)requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  function reset(){
+    nums.forEach(function(el){el.textContent='0';});
+    if(hours)hours.textContent='0,0';
+    rows.forEach(function(r){r.classList.remove('on');});
+    if(bar)bar.style.width='0%';
+  }
+
+  function play(){
+    nums.forEach(function(el,i){
+      setTimeout(function(){countTo(el,parseInt(el.dataset.n,10),900,false);},i*140);
+    });
+    rows.forEach(function(r,i){
+      setTimeout(function(){r.classList.add('on');},520+i*380);
+    });
+    setTimeout(function(){
+      if(hours)countTo(hours,parseFloat(hours.dataset.hours),1200,true);
+      if(bar)bar.style.width='78%';
+    },1750);
+  }
+
+  var running=false;
+  var loop=null;
+
+  function start(){
+    if(running)return;
+    running=true;
+    play();
+    loop=setInterval(function(){ reset(); setTimeout(play,420); },9000);
+  }
+  function stop(){
+    running=false;
+    if(loop){clearInterval(loop);loop=null;}
+  }
+
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(function(entries){
+      entries[0].isIntersecting ? start() : stop();
+    },{threshold:0.35}).observe(panel);
+  }else{
+    play();
+  }
+})();
+
+/* pestañas de vertical */
+(function(){
+  var tabs=document.querySelectorAll('.vtab');
+  var panes=document.querySelectorAll('.vpane');
+  tabs.forEach(function(t){
+    t.addEventListener('click',function(){
+      tabs.forEach(function(x){x.classList.remove('on')});
+      panes.forEach(function(p){p.classList.remove('on')});
+      t.classList.add('on');
+      var target=document.querySelector('.vpane[data-p="'+t.dataset.v+'"]');
+      if(target) target.classList.add('on');
+    });
+  });
+})();
+</script>
+</body>
+</html>

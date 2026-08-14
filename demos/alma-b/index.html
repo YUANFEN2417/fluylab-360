@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alma | Demo FluyLab, opción luz</title>
+<meta name="description" content="Segunda opción de estilo para Alma: editorial, luminosa y de lujo, con la paleta oficial de FluyLab.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* escalera tonal: de lo más claro a lo más oscuro, sin saltos bruscos */
+  --paper:#F5F1E8;      /* base */
+  --paper-2:#EFE9DC;    /* un paso más cálido */
+  --paper-3:#FBF9F4;    /* casi blanco, para respiro */
+  --sand:#E4DBC9;       /* arena, separadores */
+  --ink:#171310;        /* tinta */
+  --ink-2:rgba(23,19,16,.78);
+  --ink-3:rgba(23,19,16,.55);
+  --ink-4:rgba(23,19,16,.28);
+  --line:rgba(23,19,16,.13);
+  --line-2:rgba(23,19,16,.07);
+  --accent:#A83E12;
+  --accent-2:#C2551F;
+  --font-d:'Space Grotesk',system-ui,sans-serif;
+  --font-b:'Inter',system-ui,sans-serif;
+  --font-s:'Cormorant Garamond',Georgia,serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --maxw:1360px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--paper);color:var(--ink-2);
+  font-family:var(--font-b);font-weight:400;line-height:1.65;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+/* grano de papel */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:99;opacity:.55;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='.05'/%3E%3C/svg%3E");
+}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+h1,h2,h3,h4{font-family:var(--font-d);color:var(--ink);font-weight:600;letter-spacing:-.022em;line-height:1.04}
+
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 clamp(22px,4vw,64px)}
+section{padding:clamp(72px,10vw,140px) 0}
+.bleed{width:100%}
+
+/* reveals */
+.rv{opacity:0;transform:translateY(24px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.rv.in{opacity:1;transform:none}
+.rv.d1{transition-delay:.09s}.rv.d2{transition-delay:.18s}.rv.d3{transition-delay:.27s}
+@media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}}
+
+/* placeholder de foto */
+.ph{position:relative;overflow:hidden;background:linear-gradient(150deg,var(--paper-2),var(--paper-3));
+  display:flex;align-items:center;justify-content:center}
+.ph::before{content:attr(data-ph);font-family:var(--font-d);font-weight:500;font-size:10.5px;
+  letter-spacing:.15em;text-transform:uppercase;color:var(--ink-4);text-align:center;padding:0 20px}
+
+/* ============ banner + nav ============ */
+.demo-banner{background:var(--ink);text-align:center;padding:11px 20px;font-size:12.8px;color:rgba(245,241,232,.7)}
+.demo-banner strong{color:#E8A87C;font-weight:600}
+.demo-banner a{color:var(--paper);text-decoration:underline;text-underline-offset:3px}
+
+nav{position:sticky;top:0;z-index:60;padding:20px clamp(22px,4vw,64px);
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(245,241,232,.84);backdrop-filter:blur(18px) saturate(150%);
+  -webkit-backdrop-filter:blur(18px) saturate(150%);border-bottom:1px solid var(--line-2)}
+.logo{font-family:var(--font-d);font-weight:700;font-size:20px;letter-spacing:-.01em;color:var(--ink)}
+.logo b{color:var(--accent)}
+.nav-links{display:flex;gap:34px;font-family:var(--font-d);font-size:13.5px;font-weight:500;color:var(--ink-3)}
+.nav-links a:hover{color:var(--ink)}
+@media(max-width:820px){.nav-links{display:none}}
+.nav-cta{font-family:var(--font-d);font-weight:600;font-size:13px;color:var(--paper);background:var(--ink);
+  border:none;border-radius:999px;padding:12px 24px;cursor:pointer;transition:background .3s}
+.nav-cta:hover{background:var(--accent)}
+
+/* ============ botones ============ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  font-family:var(--font-d);font-weight:600;font-size:14px;border-radius:999px;
+  padding:17px 34px;cursor:pointer;border:1px solid transparent;white-space:nowrap;
+  transition:background .32s,color .32s,border-color .32s,transform .32s var(--ease)}
+.btn:active{transform:scale(.97)}
+.btn-p{background:var(--ink);color:var(--paper)}
+.btn-p:hover{background:var(--accent);transform:translateY(-2px)}
+.btn-g{background:none;color:var(--ink-2);border-color:var(--line)}
+.btn-g:hover{border-color:var(--ink);color:var(--ink)}
+.btn-light{background:var(--paper);color:var(--ink)}
+.btn-light:hover{background:#fff;transform:translateY(-2px)}
+
+/* ============ HERO ============ */
+#hero{position:relative;overflow:hidden;padding-top:clamp(48px,7vw,86px);padding-bottom:0;
+  background:linear-gradient(180deg,var(--paper) 0%,var(--paper) 72%,var(--paper-2) 100%)}
+#hero::before{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  background-image:radial-gradient(circle,rgba(23,19,16,.075) 1px,transparent 1px);background-size:28px 28px;
+  mask-image:radial-gradient(ellipse 70% 65% at 55% 30%,black,transparent 76%);
+  -webkit-mask-image:radial-gradient(ellipse 70% 65% at 55% 30%,black,transparent 76%)}
+/* marca de agua: mucho más grande, pero más tenue para que siga siendo sutil */
+.hero-mark{
+  position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);
+  z-index:0;pointer-events:none;user-select:none;white-space:nowrap;
+  font-family:var(--font-d);font-weight:700;font-size:min(31vw,460px);line-height:.8;
+  color:transparent;-webkit-text-stroke:1.6px rgba(23,19,16,.05);letter-spacing:-.055em;
+  mask-image:linear-gradient(180deg,black 8%,black 58%,transparent 96%);
+  -webkit-mask-image:linear-gradient(180deg,black 8%,black 58%,transparent 96%);
+}
+@media(max-width:940px){.hero-mark{top:22%;font-size:min(42vw,340px)}}
+.hero-inner{position:relative;z-index:1;display:grid;grid-template-columns:1.02fr .98fr;
+  gap:clamp(36px,5vw,80px);align-items:end;padding-bottom:clamp(56px,7vw,90px)}
+@media(max-width:940px){.hero-inner{grid-template-columns:1fr;gap:44px;align-items:start}}
+.hero-copy{padding-bottom:clamp(10px,3vw,40px)}
+.eye{font-family:var(--font-d);font-weight:600;font-size:11.5px;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--accent);margin-bottom:26px;display:flex;align-items:center;gap:12px}
+.eye::before{content:'';width:26px;height:1px;background:var(--accent)}
+#hero h1{font-size:clamp(44px,6.4vw,88px);line-height:.98;font-weight:700;margin-bottom:26px;max-width:12ch}
+.hero-sub{font-size:clamp(16.5px,1.4vw,18.5px);color:var(--ink-2);max-width:42ch;margin-bottom:38px;line-height:1.68}
+.hero-actions{display:flex;gap:14px;flex-wrap:wrap}
+.hero-visual{position:relative}
+.hero-visual .ph,.hero-visual img{width:100%;aspect-ratio:4/5;object-fit:cover}
+.hero-price{position:absolute;left:-26px;bottom:36px;background:var(--paper-3);
+  border:1px solid var(--line);padding:16px 24px;box-shadow:0 24px 60px rgba(23,19,16,.12)}
+@media(max-width:600px){.hero-price{left:14px;bottom:14px}}
+.hero-price .n{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+.hero-price .p{font-family:var(--font-d);font-weight:700;font-size:21px;color:var(--ink)}
+
+/* ============ frase de transición: el paso a oscuro se construye, no se corta ============ */
+.pause{
+  position:relative;overflow:hidden;color:var(--paper);
+  padding:clamp(118px,14vw,190px) 0;
+  /* la cremita se funde hacia la tinta y vuelve a salir al otro lado */
+  background:linear-gradient(180deg,
+    var(--paper-2) 0%,
+    #6B5F52 7%,
+    #2C2621 15%,
+    var(--ink) 26%,
+    var(--ink) 74%,
+    #2C2621 85%,
+    #6B5F52 93%,
+    var(--paper) 100%);
+}
+/* brasa cálida que justifica el cambio de luz */
+.pause::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(820px 460px at 50% 50%,rgba(168,62,18,.30),transparent 68%)}
+/* trama de puntos que amarra la textura con el resto de la página */
+.pause::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(circle,rgba(245,241,232,.07) 1px,transparent 1px);
+  background-size:30px 30px;
+  mask-image:radial-gradient(ellipse 58% 52% at 50% 50%,black,transparent);
+  -webkit-mask-image:radial-gradient(ellipse 58% 52% at 50% 50%,black,transparent)}
+.pause-inner{position:relative;z-index:1;max-width:940px;margin:0 auto;text-align:center;padding:0 clamp(22px,4vw,64px)}
+.pause p{font-family:var(--font-s);font-style:italic;font-weight:400;
+  font-size:clamp(24px,3.4vw,44px);line-height:1.34;color:var(--paper)}
+.pause p em{font-style:italic;color:#E8A87C;font-weight:500}
+.pause-sig{font-family:var(--font-d);font-size:11px;letter-spacing:.24em;text-transform:uppercase;
+  color:rgba(245,241,232,.42);margin-top:26px}
+
+/* ============ encabezados ============ */
+.head{max-width:660px;margin-bottom:clamp(44px,6vw,72px)}
+.head h2{font-size:clamp(30px,4.2vw,52px);font-weight:700}
+.head p{color:var(--ink-3);font-size:16.5px;margin-top:18px;line-height:1.7;max-width:52ch}
+
+/* ============ el oficio ============ */
+#oficio{background:var(--paper);padding-top:clamp(56px,7vw,96px)}
+.of-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(20px,2.6vw,44px)}
+@media(max-width:980px){.of-grid{grid-template-columns:1fr 1fr;gap:36px}}
+@media(max-width:560px){.of-grid{grid-template-columns:1fr}}
+.of-item{padding-top:26px;border-top:1px solid var(--ink);position:relative}
+.of-item::after{content:'';position:absolute;top:-1px;left:0;width:0;height:1px;background:var(--accent);
+  transition:width .7s var(--ease)}
+.of-item.in::after{width:100%}
+.of-n{font-family:var(--font-s);font-style:italic;font-weight:600;font-size:15px;color:var(--accent);
+  margin-bottom:16px;letter-spacing:.04em}
+.of-t{font-family:var(--font-d);font-weight:600;font-size:17.5px;color:var(--ink);margin-bottom:12px;letter-spacing:-.015em}
+.of-d{font-size:14.5px;color:var(--ink-3);line-height:1.68}
+
+/* ============ manifiesto ============ */
+.manifesto{background:var(--paper-3);border-top:1px solid var(--line-2);border-bottom:1px solid var(--line-2);
+  position:relative;overflow:hidden;padding:clamp(72px,10vw,140px) 0}
+.manifesto::before{content:'“';position:absolute;top:-70px;left:4%;font-family:var(--font-s);font-style:italic;
+  font-size:min(42vw,420px);line-height:1;color:rgba(168,62,18,.055);pointer-events:none;user-select:none}
+.manifesto-inner{position:relative;max-width:900px;margin:0 auto;text-align:center;padding:0 clamp(22px,4vw,64px)}
+.manifesto p{font-family:var(--font-s);font-style:italic;font-weight:500;
+  font-size:clamp(28px,4.4vw,58px);line-height:1.22;color:var(--ink)}
+.manifesto-sig{font-family:var(--font-d);font-size:11px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--ink-4);margin-top:30px}
+
+/* ============ proceso: a sangre, pantalla completa ============ */
+#proceso{background:var(--ink)}
+.pr-head{padding:clamp(64px,8vw,110px) 0 clamp(30px,4vw,56px)}
+.pr-head .eye{color:#E8A87C}
+.pr-head .eye::before{background:#E8A87C}
+.pr-head h2{color:var(--paper);font-size:clamp(30px,4.2vw,52px);font-weight:700}
+.pr-head p{color:rgba(245,241,232,.55);font-size:16.5px;margin-top:18px;max-width:52ch}
+.pr-outer{position:relative;height:calc(5 * 78vh)}
+.pr-sticky{position:sticky;top:0;height:100vh;overflow:hidden}
+.pr-slide{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;
+  opacity:0;transition:opacity .7s var(--ease);pointer-events:none}
+@media(max-width:900px){.pr-slide{grid-template-columns:1fr;grid-template-rows:45% 55%}}
+.pr-slide.active{opacity:1;pointer-events:auto}
+.pr-visual{position:relative;overflow:hidden;background:#221D18}
+.pr-visual img,.pr-visual .ph{width:100%;height:100%;object-fit:cover}
+.pr-visual .ph{background:repeating-linear-gradient(135deg,#221D18 0 18px,#2A241D 18px 36px)}
+.pr-visual .ph::before{color:rgba(245,241,232,.28)}
+.pr-visual::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent 60%,rgba(23,19,16,.55) 100%)}
+@media(max-width:900px){.pr-visual::after{background:linear-gradient(180deg,transparent 55%,rgba(23,19,16,.7) 100%)}}
+.pr-text{display:flex;flex-direction:column;justify-content:center;
+  padding:clamp(34px,6vw,90px);background:var(--ink)}
+.pr-n{font-family:var(--font-s);font-style:italic;font-weight:600;font-size:clamp(48px,7vw,96px);
+  color:rgba(232,168,124,.2);line-height:1;margin-bottom:18px}
+.pr-tag{font-family:var(--font-d);font-weight:600;font-size:11px;letter-spacing:.24em;
+  text-transform:uppercase;color:#E8A87C;margin-bottom:16px}
+.pr-name{color:var(--paper);font-size:clamp(26px,3.4vw,46px);font-weight:700;margin-bottom:20px;line-height:1.06;max-width:16ch}
+.pr-desc{color:rgba(245,241,232,.62);font-size:clamp(14.5px,1.3vw,17px);line-height:1.72;max-width:44ch}
+.pr-pips{position:absolute;right:clamp(18px,2.4vw,34px);top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:12px;z-index:10}
+.pip{width:26px;height:2px;background:rgba(245,241,232,.22);border:none;padding:0;cursor:pointer;
+  transition:background .35s,width .35s var(--ease)}
+.pip.on{background:#E8A87C;width:40px}
+
+/* ============ colección: carrusel con asomo ============ */
+#coleccion{background:linear-gradient(180deg,var(--ink) 0%,var(--paper) 16%,var(--paper) 100%);
+  padding-top:clamp(64px,8vw,110px)}
+.col-rail{display:flex;gap:clamp(20px,2.4vw,38px);overflow-x:auto;scroll-snap-type:x mandatory;
+  padding:6px clamp(22px,4vw,64px) 32px;margin:0 calc(-1 * clamp(22px,4vw,64px));
+  scrollbar-width:thin}
+.col-rail::-webkit-scrollbar{height:3px}
+.col-rail::-webkit-scrollbar-track{background:var(--line-2)}
+.col-rail::-webkit-scrollbar-thumb{background:var(--ink-4)}
+.prod{flex:0 0 clamp(250px,23vw,330px);scroll-snap-align:center;position:relative}
+.prod-media{position:relative;overflow:hidden;margin-bottom:20px;background:var(--paper-2)}
+.prod-media .ph,.prod-media img{width:100%;aspect-ratio:4/5;object-fit:cover;
+  transition:transform .9s var(--ease)}
+.prod:hover .prod-media img,.prod:hover .prod-media .ph{transform:scale(1.05)}
+.prod-pill{position:absolute;top:16px;left:16px;z-index:2;background:var(--paper-3);
+  font-family:var(--font-d);font-size:10.5px;font-weight:600;letter-spacing:.08em;
+  text-transform:uppercase;padding:6px 12px;color:var(--ink-2)}
+.prod-pill.low{color:var(--accent)}
+.prod-pill.out{color:var(--ink-4)}
+.prod.sold .prod-media{opacity:.5}
+.prod-name{font-family:var(--font-d);font-weight:600;font-size:17px;color:var(--ink);margin-bottom:6px}
+.prod-price{font-size:15px;color:var(--ink-3)}
+.rail-hint{display:flex;align-items:center;gap:12px;margin-top:22px;
+  font-family:var(--font-d);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-4)}
+.rail-hint span{flex:1;height:1px;background:var(--line);max-width:120px}
+
+/* ============ testimonios editoriales ============ */
+#voces{background:var(--paper-3);border-top:1px solid var(--line-2)}
+.voces-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(28px,4vw,72px)}
+@media(max-width:900px){.voces-grid{grid-template-columns:1fr;gap:52px}}
+.voz{display:flex;flex-direction:column}
+.voz-q{font-family:var(--font-s);font-style:italic;font-weight:500;
+  font-size:clamp(19px,1.9vw,25px);line-height:1.44;color:var(--ink);margin-bottom:30px;flex:1}
+.voz-by{display:flex;align-items:center;gap:14px;padding-top:22px;border-top:1px solid var(--line)}
+.voz-ini{width:42px;height:42px;flex-shrink:0;border-radius:50%;background:var(--paper-2);
+  border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-d);font-weight:600;font-size:14px;color:var(--accent)}
+.voz-n{font-family:var(--font-d);font-weight:600;font-size:14.5px;color:var(--ink);line-height:1.3}
+.voz-c{font-size:13px;color:var(--ink-3)}
+
+/* ============ garantías en fila ============ */
+#garantias{background:var(--paper)}
+.gua-row{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(28px,4vw,72px)}
+@media(max-width:820px){.gua-row{grid-template-columns:1fr;gap:44px}}
+.gua{display:flex;gap:20px;align-items:flex-start}
+.gua-ico{width:48px;height:48px;flex-shrink:0;border:1px solid var(--line);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;color:var(--accent)}
+.gua h4{font-family:var(--font-d);font-weight:600;font-size:17px;color:var(--ink);margin-bottom:8px}
+.gua p{font-size:14.5px;color:var(--ink-3);line-height:1.65}
+
+/* ============ cierre a sangre ============ */
+.closing{position:relative;overflow:hidden;background:var(--ink);
+  padding:clamp(90px,13vw,180px) clamp(22px,4vw,64px);text-align:center}
+.closing::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(820px 520px at 50% 8%,rgba(168,62,18,.3),transparent 68%)}
+.closing::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(circle,rgba(245,241,232,.07) 1px,transparent 1px);background-size:32px 32px;
+  mask-image:radial-gradient(ellipse 60% 60% at 50% 50%,black,transparent);
+  -webkit-mask-image:radial-gradient(ellipse 60% 60% at 50% 50%,black,transparent)}
+.closing-inner{position:relative;z-index:1;max-width:820px;margin:0 auto}
+.closing .eye{justify-content:center;color:#E8A87C}
+.closing .eye::before{background:#E8A87C}
+.closing h2{color:var(--paper);font-size:clamp(32px,5.2vw,66px);font-weight:700;
+  line-height:1.02;margin-bottom:22px}
+.closing p{color:rgba(245,241,232,.6);font-size:17px;margin-bottom:40px;max-width:46ch;margin-inline:auto}
+
+/* ============ pie ============ */
+footer{background:var(--ink);border-top:1px solid rgba(245,241,232,.09);padding:44px 0}
+.foot-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+.foot-row .logo{color:var(--paper)}
+.foot-links{display:flex;gap:26px;font-family:var(--font-d);font-size:13px;color:rgba(245,241,232,.5)}
+.foot-links a:hover{color:var(--paper)}
+.foot-note{font-size:12px;color:rgba(245,241,232,.32)}
+</style>
+</head>
+<body>
+
+<div class="demo-banner">
+  <strong>Demo FluyLab</strong>, opción B: misma marca Alma, identidad clara y editorial.
+  <a href="../../index.html">Volver al inicio</a> · <a href="../alma/index.html">Ver opción A (oscura)</a>
+</div>
+
+<nav>
+  <a href="#top" class="logo"><b>A</b>lma</a>
+  <div class="nav-links">
+    <a href="#oficio">El oficio</a>
+    <a href="#proceso">Proceso</a>
+    <a href="#coleccion">Colección</a>
+  </div>
+  <a href="#contacto" class="nav-cta">Escribir por WhatsApp</a>
+</nav>
+
+<main id="top">
+
+  <!-- ===== HERO ===== -->
+  <section id="hero">
+    <div class="hero-mark" aria-hidden="true">ALMA</div>
+    <div class="wrap">
+      <div class="hero-inner">
+        <div class="hero-copy">
+          <div class="eye rv">Calzado hecho a mano, Santander</div>
+          <h1 class="rv d1">La perfección no admite atajos.</h1>
+          <p class="hero-sub rv d2">Cuero curtido de forma natural, hormas propias y un taller familiar donde cada par se termina cuando está listo.</p>
+          <div class="hero-actions rv d3">
+            <a href="#coleccion" class="btn btn-p">Ver la colección</a>
+            <a href="#proceso" class="btn btn-g">Conocer el proceso</a>
+          </div>
+        </div>
+        <div class="hero-visual rv d2">
+          <img src="img/hero.jpg" alt="Modelo Bucaramanga"
+               onerror="var d=document.createElement('div');d.className='ph';d.setAttribute('data-ph','IMG-HERO: Bucaramanga, fondo neutro');d.style.aspectRatio='4/5';this.replaceWith(d);">
+          <div class="hero-price">
+            <div class="n">Modelo Bucaramanga</div>
+            <div class="p">$318.000</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAUSA OSCURA ===== -->
+  <div class="pause">
+    <div class="pause-inner rv">
+      <p>Hay cosas que no se pueden acelerar. Un cuero que se curte a su ritmo, una horma que se ajusta a mano y un par que <em>solo sale cuando está bien hecho</em>.</p>
+      <div class="pause-sig">Así trabajamos desde 1994</div>
+    </div>
+  </div>
+
+  <!-- ===== EL OFICIO ===== -->
+  <section id="oficio">
+    <div class="wrap">
+      <div class="head rv">
+        <div class="eye">Por qué importa</div>
+        <h2>Lo artesanal se nota, o no es artesanal.</h2>
+        <p>La mayoría de marcas que dicen "hecho a mano" se producen igual que una fábrica cualquiera. Estas son las diferencias que sí se sienten al ponérselos.</p>
+      </div>
+      <div class="of-grid">
+        <div class="of-item rv">
+          <div class="of-n">01</div>
+          <div class="of-t">Cuero real</div>
+          <div class="of-d">Curtido de forma natural, sin acelerantes químicos ni tratamientos en serie.</div>
+        </div>
+        <div class="of-item rv d1">
+          <div class="of-n">02</div>
+          <div class="of-t">Lote cerrado</div>
+          <div class="of-d">Cuando se agota un modelo no se repite hasta el próximo corte de temporada.</div>
+        </div>
+        <div class="of-item rv d2">
+          <div class="of-n">03</div>
+          <div class="of-t">Horma propia</div>
+          <div class="of-d">Tres generaciones ajustando la misma horma familiar, milímetro a milímetro.</div>
+        </div>
+        <div class="of-item rv d3">
+          <div class="of-n">04</div>
+          <div class="of-t">Revisión a mano</div>
+          <div class="of-d">Cada par se revisa antes de salir. Si algo no cuadra, no se despacha.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MANIFIESTO ===== -->
+  <div class="manifesto">
+    <div class="manifesto-inner rv">
+      <p>El verdadero oficio no tiene imitadores.</p>
+      <div class="manifesto-sig">Manifiesto de taller, Alma</div>
+    </div>
+  </div>
+
+  <!-- ===== PROCESO ===== -->
+  <section id="proceso" style="padding:0">
+    <div class="wrap pr-head">
+      <div class="eye rv">Cómo se hace</div>
+      <h2 class="rv d1">Cinco pasos que no se pueden saltar.</h2>
+      <p class="rv d2">Cada par recorre el mismo camino, en el mismo taller y por las mismas manos.</p>
+    </div>
+
+    <div class="pr-outer" id="prOuter">
+      <div class="pr-sticky" id="prSticky">
+
+        <div class="pr-slide active">
+          <div class="pr-visual">
+            <img src="img/proceso-01.jpg" alt="Corte del cuero"
+                 onerror="var d=document.createElement('div');d.className='ph';d.setAttribute('data-ph','IMG-PROCESO-01: Corte');this.replaceWith(d);">
+          </div>
+          <div class="pr-text">
+            <div class="pr-n">01</div>
+            <div class="pr-tag">Corte</div>
+            <h3 class="pr-name">Se corta a mano, pieza por pieza</h3>
+            <p class="pr-desc">Sin moldes de máquina. Cada pieza de cuero se marca y se corta una por una, siguiendo la veta natural del material para que el par envejezca parejo.</p>
+          </div>
+        </div>
+
+        <div class="pr-slide">
+          <div class="pr-visual">
+            <img src="img/proceso-02.jpg" alt="Costura sobre la horma"
+                 onerror="var d=document.createElement('div');d.className='ph';d.setAttribute('data-ph','IMG-PROCESO-02: Costura');this.replaceWith(d);">
+          </div>
+          <div class="pr-text">
+            <div class="pr-n">02</div>
+            <div class="pr-tag">Costura</div>
+            <h3 class="pr-name">Se cose sobre la horma familiar</h3>
+            <p class="pr-desc">La misma horma, el mismo barrio, desde hace tres generaciones. Cada puntada se hace a mano, sin atajos y sin máquinas que aprieten de más.</p>
+          </div>
+        </div>
+
+        <div class="pr-slide">
+          <div class="pr-visual">
+            <img src="img/proceso-03.jpg" alt="Acabado del cuero"
+                 onerror="var d=document.createElement('div');d.className='ph';d.setAttribute('data-ph','IMG-PROCESO-03: Acabado');this.replaceWith(d);">
+          </div>
+          <div class="pr-text">
+            <div class="pr-n">03</div>
+            <div class="pr-tag">Acabado</div>
+            <h3 class="pr-name">El cuero se trata a mano</h3>
+            <p class="pr-desc">Sellado y pulido natural, sin químicos agresivos. Por eso el cuero toma color con el uso en vez de resecarse y agrietarse.</p>
+          </div>
+        </div>
+
+        <div class="pr-slide">
+          <div class="pr-visual">
+            <img src="img/proceso-04.jpg" alt="Revisión final"
+                 onerror="var d=document.createElement('div');d.className='ph';d.setAttribute('data-ph','IMG-PROCESO-04: Revisión');this.replaceWith(d);">
+          </div>
+          <div class="pr-text">
+            <div class="pr-n">04</div>
+            <div class="pr-tag">Revisión</div>
+            <h3 class="pr-name">Se revisa par por par</h3>
+            <p class="pr-desc">Ningún par sale del taller sin control de calidad manual. Se revisa simetría, costura y acabado. Si algo no cuadra, vuelve a la mesa.</p>
+          </div>
+        </div>
+
+        <div class="pr-slide">
+          <div class="pr-visual">
+            <img src="img/proceso-05.jpg" alt="Empaque"
+                 onerror="var d=document.createElement('div');d.className='ph';d.setAttribute('data-ph','IMG-PROCESO-05: Empaque');this.replaceWith(d);">
+          </div>
+          <div class="pr-text">
+            <div class="pr-n">05</div>
+            <div class="pr-tag">Entrega</div>
+            <h3 class="pr-name">Llega listo para acompañarte</h3>
+            <p class="pr-desc">Con la guía de cuidado del cuero incluida, para que el par tome carácter con los años en vez de desgastarse.</p>
+          </div>
+        </div>
+
+        <div class="pr-pips" id="prPips"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== COLECCIÓN ===== -->
+  <section id="coleccion">
+    <div class="wrap">
+      <div class="head rv">
+        <div class="eye">Temporada actual</div>
+        <h2>La colección de esta temporada.</h2>
+        <p>Seis modelos, producción limitada por lote. Cuando un modelo se agota, no vuelve hasta el próximo corte.</p>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="col-rail rv">
+        <article class="prod">
+          <div class="prod-media">
+            <span class="prod-pill">Disponible</span>
+            <img src="img/producto-giron.jpg" alt="Modelo Girón"
+                 onerror="var d=document.createElement('div');d.className='ph';d.setAttribute('data-ph','IMG-PRODUCTO-GIRON');d.style.aspectRatio='4/5';this.replaceWith(d);">
+          </div>
+          <div class="prod-name">Modelo Girón</div>
+          <div class="prod-price">$295.000</div>
+        </article>
+        <article class="prod">
+          <div class="prod-media">
+            <span class="prod-pill low">Últimas 3 unidades</span>
+            <img src="img/producto-floridablanca.jpg" alt="Modelo Floridablanca"
+                 onerror="var d=document.createElement('div');d.className='ph';d.setAttribute('data-ph','IMG-PRODUCTO-FLORIDABLANCA');d.style.aspectRatio='4/5';this.replaceWith(d);">
+          </div>
+          <div class="prod-name">Modelo Floridablanca</div>
+          <div class="prod-price">$342.000</div>
+        </article>
+        <article class="prod">
+          <div class="prod-media">
+            <span class="prod-pill">Disponible</span>
+            <img src="img/producto-piedecuesta.jpg" alt="Modelo Piedecuesta"
+                 onerror="var d=document.createElement('div');d.className='ph';d.setAttribute('data-ph','IMG-PRODUCTO-PIEDECUESTA');d.style.aspectRatio='4/5';this.replaceWith(d);">
+          </div>
+          <div class="prod-name">Modelo Piedecuesta</div>
+          <div class="prod-price">$278.000</div>
+        </article>
+        <article class="prod">
+          <div class="prod-media">
+            <span class="prod-pill">Disponible</span>
+            <img src="img/producto-barichara.jpg" alt="Modelo Barichara"
+                 onerror="var d=document.createElement('div');d.className='ph';d.setAttribute('data-ph','IMG-PRODUCTO-BARICHARA');d.style.aspectRatio='4/5';this.replaceWith(d);">
+          </div>
+          <div class="prod-name">Modelo Barichara</div>
+          <div class="prod-price">$365.000</div>
+        </article>
+        <article class="prod sold">
+          <div class="prod-media">
+            <span class="prod-pill out">Agotado</span>
+            <img src="img/producto-sangil.jpg" alt="Modelo San Gil"
+                 onerror="var d=document.createElement('div');d.className='ph';d.setAttribute('data-ph','IMG-PRODUCTO-SANGIL');d.style.aspectRatio='4/5';this.replaceWith(d);">
+          </div>
+          <div class="prod-name">Modelo San Gil</div>
+          <div class="prod-price">$310.000</div>
+        </article>
+        <article class="prod">
+          <div class="prod-media">
+            <span class="prod-pill">Disponible</span>
+            <img src="img/producto-guane.jpg" alt="Modelo Guane"
+                 onerror="var d=document.createElement('div');d.className='ph';d.setAttribute('data-ph','IMG-PRODUCTO-GUANE');d.style.aspectRatio='4/5';this.replaceWith(d);">
+          </div>
+          <div class="prod-name">Modelo Guane</div>
+          <div class="prod-price">$298.000</div>
+        </article>
+      </div>
+      <div class="rail-hint rv"><span></span> Desliza para ver toda la colección</div>
+    </div>
+  </section>
+
+  <!-- ===== TESTIMONIOS ===== -->
+  <section id="voces">
+    <div class="wrap">
+      <div class="head rv">
+        <div class="eye">Quienes ya tienen un par</div>
+        <h2>El cuero habla solo con los años.</h2>
+      </div>
+      <div class="voces-grid">
+        <div class="voz rv">
+          <p class="voz-q">"Los usé en mi grado y no he vuelto a comprar tenis de otra marca. Ya van tres años y se ven mejor que el día uno."</p>
+          <div class="voz-by">
+            <div class="voz-ini">CR</div>
+            <div>
+              <div class="voz-n">Camila Rueda</div>
+              <div class="voz-c">Bucaramanga</div>
+            </div>
+          </div>
+        </div>
+        <div class="voz rv d1">
+          <p class="voz-q">"El cuero toma color con el uso, no se gasta. Eso no lo consigues en una marca que produce en masa."</p>
+          <div class="voz-by">
+            <div class="voz-ini">AS</div>
+            <div>
+              <div class="voz-n">Andrés Silva</div>
+              <div class="voz-c">Bogotá</div>
+            </div>
+          </div>
+        </div>
+        <div class="voz rv d2">
+          <p class="voz-q">"Pedí talla 38 y llegó perfecto. El cambio de talla fue sin dramas y el par llegó en cinco días."</p>
+          <div class="voz-by">
+            <div class="voz-ini">VP</div>
+            <div>
+              <div class="voz-n">Valentina Pardo</div>
+              <div class="voz-c">Medellín</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== GARANTÍAS ===== -->
+  <section id="garantias">
+    <div class="wrap">
+      <div class="gua-row">
+        <div class="gua rv">
+          <div class="gua-ico">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="7" width="15" height="13" rx="2"/><path d="M16 10h3l3 3v4h-6z"/><circle cx="6" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/></svg>
+          </div>
+          <div>
+            <h4>Envíos a toda Colombia</h4>
+            <p>Entrega en 3 a 5 días hábiles, con seguimiento desde que sale del taller.</p>
+          </div>
+        </div>
+        <div class="gua rv d1">
+          <div class="gua-ico">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
+          </div>
+          <div>
+            <h4>Cambios sin costo</h4>
+            <p>15 días para cambiar la talla. Sin preguntas y sin cobros de envío.</p>
+          </div>
+        </div>
+        <div class="gua rv d2">
+          <div class="gua-ico">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2 3 7v6c0 5 4 8 9 9 5-1 9-4 9-9V7z"/><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+          <div>
+            <h4>Pago seguro</h4>
+            <p>Tarjeta, PSE o contraentrega. Tú eliges cómo, nosotros respondemos igual.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CIERRE ===== -->
+  <div class="closing" id="contacto">
+    <div class="closing-inner rv">
+      <div class="eye">Lista de espera</div>
+      <h2>Sé la primera en ver la próxima temporada.</h2>
+      <p>Escríbenos y te avisamos apenas salga el próximo corte, antes de que se agote.</p>
+      <a href="#" class="btn btn-light">Escribir por WhatsApp</a>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div class="wrap foot-row">
+    <div class="logo"><b>A</b>lma</div>
+    <div class="foot-links">
+      <a href="#oficio">El oficio</a>
+      <a href="#proceso">Proceso</a>
+      <a href="#coleccion">Colección</a>
+    </div>
+    <div class="foot-note">Demo construida por FluyLab. Esta no es una marca real.</div>
+  </div>
+</footer>
+
+<script>
+var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* reveals */
+(function(){
+  var els=document.querySelectorAll('.rv, .of-item');
+  if(reduceMotion||!('IntersectionObserver' in window)){
+    els.forEach(function(e){e.classList.add('in');});return;
+  }
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}
+    });
+  },{threshold:0.12,rootMargin:'0px 0px -6% 0px'});
+  els.forEach(function(e){io.observe(e);});
+})();
+
+/* proceso con scroll fijo */
+(function(){
+  var outer=document.getElementById('prOuter');
+  var sticky=document.getElementById('prSticky');
+  var pipWrap=document.getElementById('prPips');
+  if(!outer||!sticky||!pipWrap)return;
+  var slides=sticky.querySelectorAll('.pr-slide');
+  var n=slides.length;
+  if(!n)return;
+  var cur=0;
+
+  for(var i=0;i<n;i++){
+    (function(idx){
+      var b=document.createElement('button');
+      b.className='pip'+(idx===0?' on':'');
+      b.setAttribute('aria-label','Paso '+(idx+1));
+      b.addEventListener('click',function(){
+        var top=outer.getBoundingClientRect().top+window.scrollY;
+        var range=outer.offsetHeight-window.innerHeight;
+        window.scrollTo({top:top+(idx/(n-1))*range,behavior:'smooth'});
+      });
+      pipWrap.appendChild(b);
+    })(i);
+  }
+
+  function go(idx){
+    slides[cur].classList.remove('active');
+    cur=idx;
+    slides[cur].classList.add('active');
+    pipWrap.querySelectorAll('.pip').forEach(function(p,i){p.classList.toggle('on',i===cur);});
+  }
+
+  if(reduceMotion)return;
+
+  var ticking=false;
+  window.addEventListener('scroll',function(){
+    if(ticking)return;
+    ticking=true;
+    requestAnimationFrame(function(){
+      var r=outer.getBoundingClientRect();
+      var range=outer.offsetHeight-window.innerHeight;
+      if(range<=0){ticking=false;return;}
+      var p=-r.top/range;
+      var idx=Math.min(n-1,Math.max(0,Math.round(p*(n-1))));
+      if(idx!==cur)go(idx);
+      ticking=false;
+    });
+  },{passive:true});
+})();
+</script>
+
+</body>
+</html>
