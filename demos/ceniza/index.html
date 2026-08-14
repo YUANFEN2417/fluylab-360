@@ -37,9 +37,14 @@
   em{font-style:italic;}
   img{max-width:100%;display:block;}
   a{color:inherit;text-decoration:none;}
-  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px;}
+  /* ojo: usar el atajo "padding:0 32px" aqui anulaba el aire vertical
+     de section{padding:120px 0} y dejaba toda la pagina apretada */
+  .wrap{max-width:var(--maxw);margin:0 auto;padding-left:32px;padding-right:32px;}
   section{padding:120px 0;}
-  @media (max-width:768px){section{padding:72px 0;} .wrap{padding:0 20px;}}
+  @media (max-width:768px){section{padding:72px 0;} .wrap{padding-left:20px;padding-right:20px;}}
+  nav.wrap{padding-top:0;padding-bottom:0;}
+  /* el bloque de experiencia queda entre dos bloques de foto: pide mas aire */
+  #experiencia{padding-top:clamp(96px,11vw,168px);padding-bottom:clamp(96px,11vw,168px);}
 
   .btn{
     display:inline-flex;align-items:center;justify-content:center;gap:10px;
@@ -201,12 +206,16 @@
 
   /* experiencia full width */
   .experience{
-    position:relative;border-radius:8px;overflow:hidden;
-    min-height:70vh;display:flex;align-items:center;
+    position:relative;overflow:hidden;
+    min-height:76vh;display:flex;align-items:center;
   }
   .experience-bg{position:absolute;inset:0;}
   .experience-bg img{width:100%;height:100%;object-fit:cover;}
-  .experience-bg::after{content:"";position:absolute;inset:0;background:rgba(11,9,8,0.62);}
+  /* la foto se funde con el fondo por arriba y por abajo: nada de recorte duro */
+  .experience-bg::after{content:"";position:absolute;inset:0;
+    background:
+      linear-gradient(180deg,var(--bg) 0%,rgba(11,9,8,.5) 16%,rgba(11,9,8,.42) 60%,rgba(11,9,8,.92) 92%,var(--bg) 100%),
+      linear-gradient(90deg,rgba(11,9,8,.9) 0%,rgba(11,9,8,.62) 42%,rgba(11,9,8,.3) 72%,rgba(11,9,8,.5) 100%);}
   .experience-content{position:relative;z-index:1;max-width:640px;padding:0 56px;}
   @media (max-width:768px){.experience-content{padding:0 28px;}}
   .experience blockquote{
@@ -393,8 +402,8 @@
   <section class="wrap" id="experiencia">
     <div class="experience reveal">
       <div class="experience-bg">
-        <img src="img/salon.jpg" alt="Salón del restaurante Ceniza"
-             onerror="this.style.display='none';">
+        <img src="img/experiencia.jpg" alt="Mesa montada con el nombre del comensal y su término de carne"
+             onerror="if(!this.dataset.f){this.dataset.f=1;this.src='img/salon.jpg';}else{this.style.display='none';}">
       </div>
       <div class="experience-content">
         <blockquote>"Sabemos tu nombre antes de que llegues, y cómo te gusta la carne antes de que lo pidas."</blockquote>
