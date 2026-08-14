@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Alma | Demo FluyLab, opción luz</title>
 <meta name="description" content="Segunda opción de estilo para Alma: editorial, luminosa y de lujo, con la paleta oficial de FluyLab.">
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
@@ -302,12 +303,19 @@ footer{background:var(--ink);border-top:1px solid rgba(245,241,232,.09);padding:
 .foot-links{display:flex;gap:26px;font-family:var(--font-d);font-size:13px;color:rgba(245,241,232,.5)}
 .foot-links a:hover{color:var(--paper)}
 .foot-note{font-size:12px;color:rgba(245,241,232,.32)}
+
+/* logo de FluyLab dentro de la demo */
+.demo-banner{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap}
+.demo-banner img{height:19px;width:auto;display:block;flex-shrink:0}
+.demo-banner .db-home{display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+.demo-banner .db-home:hover{opacity:.8}
 </style>
 </head>
 <body>
 
 <div class="demo-banner">
-  <strong>Demo FluyLab</strong>, opción B: misma marca Alma, identidad clara y editorial.
+  <a href="../../index.html" class="db-home" aria-label="FluyLab, ir al inicio"><img src="../../assets/fluylab-logo-claro.png" alt="FluyLab"></a>
+  <span>Demo, opción B: misma marca Alma, identidad clara y editorial.</span>
   <a href="../../index.html">Volver al inicio</a> · <a href="../alma/index.html">Ver opción A (oscura)</a>
 </div>
 

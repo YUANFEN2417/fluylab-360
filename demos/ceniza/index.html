@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ceniza | Demo FluyLab, 3D real en el navegador</title>
 <meta name="description" content="Demo de FluyLab con 3D real en WebGL: brasas volumétricas que reaccionan al cursor y al scroll, para negocios que quieren verse premium.">
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
@@ -282,12 +283,20 @@
   .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1);}
   .reveal.in{opacity:1;transform:translateY(0);}
   @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none;}}
+
+/* logo de FluyLab dentro de la demo */
+.demo-banner{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap}
+.demo-banner img{height:19px;width:auto;display:block;flex-shrink:0}
+.demo-banner .db-home{display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+.demo-banner .db-home:hover{opacity:.8}
+  .fluy-logo{height:34px;width:auto;display:block;margin:0 auto 22px}
 </style>
 </head>
 <body>
 
 <div class="demo-banner">
-  <strong>Demo FluyLab</strong>, 3D real corriendo en tu navegador. Mueve el cursor y haz scroll sobre el fuego. <a href="../../index.html">Volver a la página principal</a>
+  <a href="../../index.html" class="db-home" aria-label="FluyLab, ir al inicio"><img src="../../assets/fluylab-logo-claro.png" alt="FluyLab"></a>
+  <span>Demo. Mueve el cursor y haz scroll sobre el fuego.</span> <a href="../../index.html">Volver a la página principal</a>
 </div>
 
 <header>
@@ -451,7 +460,7 @@
   <!-- CTA de FluyLab, cierre de la demo -->
   <section class="wrap" id="cotiza">
     <div class="fluy-cta reveal">
-      <div class="fluy-mark">FluyLab</div>
+      <img class="fluy-logo" src="../../assets/fluylab-logo-claro.png" alt="FluyLab">
       <h2>¿Te gustó cómo se ve esta página?</h2>
       <p>Esto es una demo, pero la tuya puede verse así. Escríbenos y te cotizamos la página web de tu negocio, con el mismo nivel de acabado.</p>
       <div class="fluy-actions">
