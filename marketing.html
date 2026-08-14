@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Marketing orgánico para tu negocio | FluyLab</title>
-<meta name="description" content="Contenido, grabación y estrategia para que dejes de depender de la pauta paga. Desde $1.500.000 COP mensuales. Diagnóstico $150.000, abonable al proyecto.">
+<meta name="description" content="Estrategia, contenido y producción para que tu marca se vea viva, coherente y creíble. Desde $1.500.000 COP mensuales.">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,22 +14,61 @@
 .hero-mk{display:grid;grid-template-columns:1.06fr .94fr;gap:56px;align-items:center}
 @media(max-width:940px){.hero-mk{grid-template-columns:1fr;gap:44px}}
 
-/* comparación pauta vs orgánico */
-.compare-chart{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:28px 26px;
+/* vitrina del hero: el feed se arma solo */
+.feed{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px;
   box-shadow:0 30px 90px rgba(0,0,0,.45)}
-.chart-title{font-family:var(--font-d);font-weight:600;font-size:13px;color:var(--cream2);margin-bottom:4px}
-.chart-sub{font-size:11.5px;color:var(--cream4);margin-bottom:22px}
-.chart-row{margin-bottom:20px}
-.chart-lbl{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
-.chart-lbl b{font-family:var(--font-d);font-weight:600;font-size:13px;color:var(--cream)}
-.chart-lbl span{font-size:11.5px;color:var(--cream3)}
-.chart-track{height:9px;background:rgba(243,237,228,.06);border-radius:99px;overflow:hidden;position:relative}
-.chart-fill{height:100%;border-radius:99px;width:0;animation:fill 1.9s var(--ease) forwards}
-.chart-fill.paid{background:linear-gradient(90deg,rgba(243,237,228,.25),rgba(243,237,228,.14))}
-.chart-fill.org{background:linear-gradient(90deg,var(--orange),var(--orange2))}
-@keyframes fill{to{width:var(--w)}}
-@media(prefers-reduced-motion:reduce){.chart-fill{animation:none;width:var(--w)}}
-.chart-note{font-size:11.8px;color:var(--cream4);line-height:1.5;padding-top:16px;border-top:1px solid var(--line2)}
+.feed-top{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.feed-av{width:40px;height:40px;border-radius:50%;flex-shrink:0;
+  background:conic-gradient(from 210deg,var(--orange),var(--terracota),var(--orange2),var(--orange));
+  position:relative}
+.feed-av::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--surface)}
+.feed-top b{font-family:var(--font-d);font-weight:600;font-size:13.5px;color:var(--cream);display:block}
+.feed-top span{font-size:11.5px;color:var(--cream3)}
+.feed-live{margin-left:auto;display:inline-flex;align-items:center;gap:6px;flex-shrink:0;
+  font-family:var(--font-d);font-size:11px;font-weight:600;color:var(--cream3);
+  border:1px solid var(--line);border-radius:999px;padding:5px 11px}
+.feed-live i{width:6px;height:6px;border-radius:50%;background:var(--orange);
+  box-shadow:0 0 9px rgba(255,106,0,.9);font-style:normal;animation:fLive 2.4s ease-in-out infinite}
+@keyframes fLive{0%,100%{opacity:1}50%{opacity:.3}}
+.feed-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.ft{aspect-ratio:1/1;border-radius:7px;opacity:0;transform:scale(.86);
+  background:linear-gradient(150deg,var(--s3),var(--s2));
+  border:1px solid var(--line2)}
+.rv.in .ft{animation:ftIn .55s cubic-bezier(.16,1,.3,1) forwards;
+  animation-delay:calc(var(--i) * .085s + .25s)}
+@keyframes ftIn{to{opacity:1;transform:none}}
+/* tres piezas encendidas: la vitrina se ve viva, no vacia */
+.ft:nth-child(2),.ft:nth-child(4),.ft:nth-child(9){
+  background:linear-gradient(150deg,rgba(255,106,0,.34),rgba(255,106,0,.08));
+  border-color:rgba(255,106,0,.28)}
+.feed-foot{margin-top:16px;padding-top:14px;border-top:1px solid var(--line2);
+  font-size:12px;color:var(--cream4);line-height:1.5}
+@media(prefers-reduced-motion:reduce){.ft{opacity:1;transform:none}.feed-live i{animation:none}}
+
+/* por que importa: editorial, sin iconos ni numeros */
+.why3{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(24px,3vw,44px)}
+@media(max-width:900px){.why3{grid-template-columns:1fr;gap:34px}}
+.w3{position:relative;padding-top:26px}
+.w3::before{content:'';position:absolute;top:0;left:0;height:2px;width:0;
+  background:linear-gradient(90deg,var(--orange),rgba(255,106,0,.12));border-radius:2px;
+  transition:width 1s var(--ease)}
+.rv.in .w3::before{width:100%}
+.w3.b::before{transition-delay:.15s}
+.w3.c::before{transition-delay:.3s}
+@media(prefers-reduced-motion:reduce){.w3::before{width:100%;transition:none}}
+.w3 h3{font-size:clamp(19px,2.2vw,23px);line-height:1.22;margin-bottom:14px}
+.w3 p{font-size:14.6px;color:var(--cream3);line-height:1.74}
+
+/* ritmos de publicacion */
+.ritmos{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:22px;
+  border:1px solid var(--line);border-radius:18px;overflow:hidden}
+@media(max-width:768px){.ritmos{grid-template-columns:1fr}}
+.ritmo{background:var(--surface);padding:26px 26px;transition:background .3s}
+.ritmo:hover{background:var(--s2)}
+.ritmo b{font-family:var(--font-d);font-weight:600;font-size:15.5px;color:var(--cream);display:block;margin-bottom:7px}
+.ritmo p{font-size:13.5px;color:var(--cream3);line-height:1.6;margin-bottom:14px}
+.ritmo em{font-family:var(--font-d);font-style:normal;font-weight:700;font-size:17px;color:var(--orange)}
+.ritmo em small{font-weight:500;font-size:12.5px;color:var(--cream3);margin-left:4px}
 
 /* dolor */
 .pain-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2px;
@@ -54,9 +93,10 @@
 
 /* mes a mes */
 .timeline{position:relative;padding-left:0}
-.tl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;
+.tl-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;
   border:1px solid var(--line);border-radius:18px;overflow:hidden}
-@media(max-width:860px){.tl-grid{grid-template-columns:1fr}}
+@media(max-width:1000px){.tl-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.tl-grid{grid-template-columns:1fr}}
 .tl{background:var(--surface);padding:32px 28px}
 .tl-when{font-family:var(--font-d);font-weight:700;font-size:11.5px;letter-spacing:.16em;
   text-transform:uppercase;color:var(--orange);margin-bottom:14px}
@@ -86,6 +126,11 @@
   border-left:3px solid var(--orange);margin-top:26px}
 .honest h4{font-size:15.5px;margin-bottom:10px}
 .honest p{font-size:14px;color:var(--cream2);line-height:1.65}
+
+/* remate del bloque de conexion */
+.link-note{margin-top:26px;padding-top:22px;border-top:1px solid var(--line2);
+  font-size:15px;color:var(--cream2);line-height:1.7;text-align:center;max-width:62ch;
+  margin-left:auto;margin-right:auto}
 </style>
 </head>
 <body>
@@ -99,7 +144,7 @@
     <a href="marketing.html" class="on">Marketing</a>
     <a href="#precio">Precio</a>
   </div>
-  <a href="#contacto" class="btn btn-p" style="padding:11px 20px;font-size:13.5px">Pide tu diagnóstico</a>
+  <a href="#contacto" class="btn btn-p" style="padding:11px 20px;font-size:13.5px">Hablemos de tu marca</a>
 </nav>
 
 <main id="top">
@@ -113,26 +158,29 @@
       <div class="hero-mk">
         <div>
           <div class="eye rv">Puerta 3 · Marketing orgánico</div>
-          <h1 class="rv d1">Si apagas la pauta y <span class="gr">se apaga el teléfono</span>, no tienes marca.</h1>
-          <p class="lead rv d2">Tienes un canal alquilado. El marketing orgánico construye algo que es tuyo: contenido que la gente recuerda, comparte y busca, aunque ese mes no pongas un peso en anuncios.</p>
+          <h1 class="rv d1">Si tu marca no genera <span class="gr">confianza</span>, no importa cómo te encuentren.</h1>
+          <p class="lead rv d2">Estrategia, contenido y publicaciones que hacen que tu negocio se vea vivo, profesional y creíble. Que cada persona que llegue, por recomendación, por búsqueda o por curiosidad, encuentre una razón para quedarse.</p>
           <div class="hero-actions rv d3">
-            <a href="#contacto" class="btn btn-p btn-pulse">Pide tu diagnóstico</a>
+            <a href="#contacto" class="btn btn-p btn-pulse">Hablemos de tu marca</a>
             <a href="#incluye" class="btn btn-g">Ver qué incluye</a>
           </div>
         </div>
         <div class="rv d2">
-          <div class="compare-chart">
-            <div class="chart-title">Qué pasa cuando dejas de pagar</div>
-            <div class="chart-sub">Alcance que conservas al mes siguiente</div>
-            <div class="chart-row">
-              <div class="chart-lbl"><b>Solo pauta paga</b><span>se apaga con el anuncio</span></div>
-              <div class="chart-track"><div class="chart-fill paid" style="--w:12%"></div></div>
+          <div class="feed">
+            <div class="feed-top">
+              <div class="feed-av"></div>
+              <div>
+                <b>tu.negocio</b>
+                <span>Publicando 3 veces por semana</span>
+              </div>
+              <div class="feed-live"><i></i>Activo</div>
             </div>
-            <div class="chart-row">
-              <div class="chart-lbl"><b>Con base orgánica</b><span>el contenido sigue trabajando</span></div>
-              <div class="chart-track"><div class="chart-fill org" style="--w:84%"></div></div>
+            <div class="feed-grid" aria-hidden="true">
+              <div class="ft" style="--i:0"></div><div class="ft" style="--i:1"></div><div class="ft" style="--i:2"></div>
+              <div class="ft" style="--i:3"></div><div class="ft" style="--i:4"></div><div class="ft" style="--i:5"></div>
+              <div class="ft" style="--i:6"></div><div class="ft" style="--i:7"></div><div class="ft" style="--i:8"></div>
             </div>
-            <p class="chart-note">Gráfico ilustrativo del concepto, no de resultados medidos. Lo pagado deja de existir cuando dejas de pagar; lo orgánico se queda publicado y se sigue encontrando.</p>
+            <div class="feed-foot">Una vitrina que se ve cuidada dice más de tu negocio que cualquier anuncio.</div>
           </div>
         </div>
       </div>
@@ -141,29 +189,54 @@
 
   <div class="divider"></div>
 
+  <!-- POR QUÉ IMPORTA -->
+  <section>
+    <div class="wrap">
+      <div class="sec-head rv">
+        <div class="eye">Por qué importa</div>
+        <h2 class="sec-h">Tu contenido es la primera impresión de tu negocio.</h2>
+      </div>
+      <div class="why3 rv d1">
+        <div class="w3">
+          <h3>Te revisan antes de escribirte</h3>
+          <p>Antes de comprarte, la gente entra a tus redes. Si lo que encuentra se ve descuidado, inconsistente o muerto, no se arriesga. Se va con alguien que se ve más serio.</p>
+        </div>
+        <div class="w3 b">
+          <h3>Que te recuerden primero</h3>
+          <p>Cuando publicas con estrategia y constancia, tu negocio se queda en la cabeza de la gente. El día que necesiten lo que vendes, piensan en ti, no en tu competencia.</p>
+        </div>
+        <div class="w3 c">
+          <h3>Lo de hoy sigue trabajando mañana</h3>
+          <p>Un post no desaparece. El contenido que publicas esta semana puede traerte un cliente dentro de tres meses. Es una inversión que se acumula, no un gasto que se evapora.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
   <!-- DOLOR -->
   <section>
     <div class="wrap">
       <div class="sec-head rv">
         <div class="eye">Por qué duele</div>
-        <h2 class="sec-h">Depender solo de la pauta es alquilar tus clientes.</h2>
-        <p class="sec-sub">Funciona, y funciona rápido. El problema es lo que pasa el día que subes el presupuesto y ya no rinde igual, o el día que toca cerrar la llave.</p>
+        <h2 class="sec-h">Tu negocio puede ser bueno. Pero si nadie lo ve, no existe.</h2>
       </div>
       <div class="pain-grid rv d1">
         <div class="pain">
           <div class="pain-n">01</div>
-          <h3>Cada cliente cuesta un anuncio</h3>
-          <p>No hay acumulación. El de este mes no te hace más barato el del mes que viene, y el costo por cliente solo tiende a subir.</p>
+          <h3>Tu negocio existe, pero tu marca no se siente</h3>
+          <p>Tienes clientes, tienes producto, pero cuando alguien entra a tus redes no encuentra nada que le diga que te tomen en serio. Sin presencia no hay credibilidad, y sin credibilidad no hay venta.</p>
         </div>
         <div class="pain">
           <div class="pain-n">02</div>
-          <h3>Nadie te recuerda</h3>
-          <p>Ven el anuncio, compran o no, y se olvidan. No hay una marca que se quede en la cabeza ni algo que valga la pena recomendar.</p>
+          <h3>Publicas cuando te acuerdas, sin saber si sirve</h3>
+          <p>Una foto un martes, un reel que se te ocurrió, silencio tres semanas. Sin estrategia cada publicación es un tiro al aire. Y la inconsistencia le dice al cliente que tu negocio funciona igual.</p>
         </div>
         <div class="pain">
           <div class="pain-n">03</div>
-          <h3>Publicas sin rumbo</h3>
-          <p>Se sube lo que se alcanzó a grabar esa semana. Sin estrategia, sin constancia, y sin saber qué de todo eso sirvió.</p>
+          <h3>Sabes que deberías publicar, pero no tienes ni el tiempo ni el equipo</h3>
+          <p>Tienes el negocio encima, atiendes clientes, manejas proveedores, cuadras cuentas. ¿Y además grabar, editar y publicar? No es que no quieras: es que no te da la vida.</p>
         </div>
       </div>
     </div>
@@ -185,13 +258,13 @@
           <div class="card-glow"></div>
           <div class="inc-ico"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg></div>
           <h4>Estrategia</h4>
-          <p>Qué contar, a quién y por qué. Definimos los pilares de contenido según lo que tu negocio de verdad vende.</p>
+          <p>Qué contar, a quién y por qué. Definimos los pilares de contenido según lo que tu negocio necesita comunicar.</p>
         </div>
         <div class="card inc-card rv d2">
           <div class="card-glow"></div>
           <div class="inc-ico"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg></div>
           <h4>Grabación y edición</h4>
-          <p>Vamos, grabamos y editamos. Video, foto y piezas listas para publicar, con la calidad que tu marca merece.</p>
+          <p>Vamos, grabamos y editamos. Video, foto y piezas listas para publicar, con la calidad que tu marca necesita.</p>
         </div>
         <div class="card inc-card rv d3">
           <div class="card-glow"></div>
@@ -203,19 +276,19 @@
           <div class="card-glow"></div>
           <div class="inc-ico"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 15v-4M12 15V7M17 15v-6"/></svg></div>
           <h4>Medición honesta</h4>
-          <p>Qué funcionó y qué no, en lenguaje claro. Sin métricas de vanidad que se ven bonitas y no venden nada.</p>
+          <p>Qué funcionó, qué no, y qué vamos a ajustar el mes siguiente. Sin métricas que se ven bonitas pero no te dicen nada.</p>
         </div>
         <div class="card inc-card rv d2">
           <div class="card-glow"></div>
           <div class="inc-ico"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg></div>
-          <h4>Identidad consistente</h4>
-          <p>Todo lo que se publica se ve como tu marca. Mismo tono, misma línea visual, en todos lados.</p>
+          <h4>Presencia coherente</h4>
+          <p>Que tu marca se vea igual en Instagram, en WhatsApp, en tu web y en la vida real. Misma voz, misma imagen, en todos lados.</p>
         </div>
         <div class="card inc-card rv d3">
           <div class="card-glow"></div>
           <div class="inc-ico"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></div>
           <h4>Conectado a tu web</h4>
-          <p>El contenido lleva a tu página y tu página convierte. Los dos servicios trabajan juntos, no cada uno por su lado.</p>
+          <p>Si tienes página web con nosotros, el contenido y la web trabajan juntos. Lo que publicas lleva a la gente a un lugar donde puede comprarte de verdad.</p>
         </div>
       </div>
     </div>
@@ -229,28 +302,33 @@
       <div class="sec-head rv">
         <div class="eye">Qué esperar</div>
         <h2 class="sec-h">Esto no es magia, es constancia.</h2>
-        <p class="sec-sub">El orgánico no explota en dos semanas. Así se ve un proceso realista.</p>
+        <p class="sec-sub">Hay cosas que se notan desde la primera semana y otras que se construyen. Así se ve el proceso completo, sin adornos.</p>
       </div>
       <div class="tl-grid rv d1">
         <div class="tl">
+          <div class="tl-when">Semana 1</div>
+          <h4>Se nota de una</h4>
+          <p>Línea visual, tono y primeras piezas publicadas con estructura e intención. El que entre a tus redes ya ve otro negocio. Tus propios clientes son los primeros en decírtelo.</p>
+        </div>
+        <div class="tl">
           <div class="tl-when">Mes 1</div>
-          <h4>Base y producción</h4>
-          <p>Definimos estrategia, línea visual y tono. Primera jornada de grabación y arranque de publicaciones con ritmo constante.</p>
+          <h4>Base y ritmo</h4>
+          <p>Estrategia definida, primera jornada de grabación y publicación constante. Dejas de aparecer a ratos y tu vitrina se ve ordenada.</p>
         </div>
         <div class="tl">
           <div class="tl-when">Mes 2 y 3</div>
-          <h4>Ritmo y ajuste</h4>
+          <h4>Ajuste</h4>
           <p>Ya hay material suficiente para ver qué formato conecta. Doblamos lo que funciona y soltamos lo que no.</p>
         </div>
         <div class="tl">
           <div class="tl-when">Mes 4 en adelante</div>
           <h4>Acumulación</h4>
-          <p>El contenido viejo sigue trayendo gente. Ahí es donde el orgánico empieza a bajarte el costo por cliente.</p>
+          <p>La gente te reconoce y te recomienda. Lo que publicaste hace meses sigue trayendo gente sin que tengas que hacer nada nuevo.</p>
         </div>
       </div>
       <div class="honest rv d2">
         <h4>Lo decimos de frente</h4>
-        <p>El marketing orgánico es más lento que la pauta y no garantiza un número de clientes. Lo que sí garantiza es que lo que construyes queda siendo tuyo. Si necesitas ventas mañana, empieza por la pauta y construye lo orgánico en paralelo.</p>
+        <p>Esto no llena tu negocio de clientes en dos semanas. Lo que hace es construir algo que dura: una marca que la gente reconoce, recuerda y recomienda. Es un proceso, no un milagro. Pero lo que construyes hoy sigue trabajando mañana, el mes que viene y el año que viene.</p>
       </div>
     </div>
   </section>
@@ -268,17 +346,35 @@
         <div>
           <div class="price-from">Desde</div>
           <div class="price-big">$1.500.000 <span style="font-size:16px;font-weight:500;color:var(--cream3)">COP / mes</span></div>
-          <p class="price-note">Incluye estrategia, producción, edición, publicación y medición. El valor final depende de cuántas piezas al mes y cuántas jornadas de grabación necesite tu marca.</p>
+          <p class="price-note">Incluye estrategia, producción, edición, publicación y medición. El valor final depende del ritmo de publicación y de cuántas jornadas de grabación necesite tu marca.</p>
         </div>
         <div>
           <ul class="checks" style="margin-bottom:24px">
             <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Producción y edición incluidas</li>
-            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Sin permanencia forzada de años</li>
+            <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Trabajamos por ciclos de tres meses</li>
             <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Reporte mensual en lenguaje claro</li>
             <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>Descuento si lo combinas con web o software</li>
           </ul>
           <a href="#contacto" class="btn btn-p btn-pulse">Hablemos de tu marca</a>
         </div>
+      </div>
+
+      <div class="ritmos rv d2">
+        <div class="ritmo">
+          <b>Ritmo constante</b>
+          <p>3 publicaciones por semana y una jornada de grabación al mes. El punto de partida para la mayoría de negocios.</p>
+          <em>desde $1.500.000<small>COP / mes</small></em>
+        </div>
+        <div class="ritmo">
+          <b>Ritmo diario</b>
+          <p>Publicación todos los días y dos jornadas de grabación al mes. Para marcas que ya compiten por atención.</p>
+          <em>alrededor de $2.200.000<small>COP / mes</small></em>
+        </div>
+      </div>
+
+      <div class="honest rv d3">
+        <h4>Por qué trabajamos por ciclos</h4>
+        <p>Un ciclo son tres meses. Es lo que tarda una marca en tomar ritmo y en darnos material suficiente para saber qué está funcionando de verdad. Al cerrar el ciclo miramos los números juntos y tú decides si sigue.</p>
       </div>
     </div>
   </section>
@@ -290,13 +386,12 @@
     <div class="wrap">
       <div class="sec-head rv">
         <div class="eye">No trabaja solo</div>
-        <h2 class="sec-h">El marketing trae la gente. Alguien tiene que atenderla.</h2>
-        <p class="sec-sub">De nada sirve llenar de visitas una web que no convierte, o llenar de clientes un negocio que no da abasto.</p>
+        <h2 class="sec-h">La presencia digital es la base. Pero no trabaja sola.</h2>
       </div>
       <div class="link-grid rv d1">
         <div class="link-card">
           <h4>Página web</h4>
-          <p>Es donde aterriza toda la gente que trae el contenido. Si esa página no convierte, el marketing se desperdicia.</p>
+          <p>Tu contenido lleva gente a algún lado. Si ese lugar no funciona bien, la confianza que construiste se pierde en el último paso.</p>
           <a href="web.html" class="go">Ver página web
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
           </a>
@@ -309,6 +404,7 @@
           </a>
         </div>
       </div>
+      <p class="link-note rv d2">Y cuando decidas invertir en publicidad, tu marca ya va a estar lista para recibir a esa gente.</p>
     </div>
   </section>
 
@@ -327,8 +423,8 @@
             <div class="a-bar hot" style="--h:100%"></div>
           </div>
         </div>
-        <h2>Miremos qué tan lejos llega tu marca sin pauta.</h2>
-        <p>Escríbenos y hablamos sin compromiso. Si quieres el diagnóstico completo de tu presencia digital, cuesta $150.000 y te lo abonamos al proyecto si arrancamos juntos.</p>
+        <h2>Miremos cómo se ve tu marca hoy y qué haría falta para que te tomen en serio.</h2>
+        <p>Revisamos tus redes y tu presencia actual, y te decimos qué construiríamos primero. Sin costo y sin compromiso.</p>
         <a href="https://wa.me/57XXXXXXXXXX?text=Hola%2C%20quiero%20hablar%20de%20marketing%20org%C3%A1nico" class="btn btn-p btn-pulse">Escribir por WhatsApp</a>
       </div>
     </div>
