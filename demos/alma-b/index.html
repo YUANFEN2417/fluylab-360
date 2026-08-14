@@ -119,7 +119,7 @@ nav{position:sticky;top:0;z-index:60;padding:20px clamp(22px,4vw,64px);
 @media(prefers-reduced-motion:reduce){.motes{display:none}.sunbeam{filter:blur(40px)}}
 
 .hero-mark{
-  position:absolute;left:34%;top:44%;transform:translate(-50%,-50%);
+  position:absolute;left:26%;top:44%;transform:translate(-50%,-50%);
   z-index:0;pointer-events:none;user-select:none;white-space:nowrap;
   font-family:var(--font-d);font-weight:700;font-size:min(29vw,420px);line-height:.8;
   color:transparent;-webkit-text-stroke:1.6px rgba(23,19,16,.055);letter-spacing:-.055em;
@@ -129,8 +129,8 @@ nav{position:sticky;top:0;z-index:60;padding:20px clamp(22px,4vw,64px);
 @media(max-width:940px){.hero-mark{left:50%;top:20%;font-size:min(42vw,340px)}}
 
 /* la foto se sale del borde derecho, sin marco */
-.hero-photo{position:absolute;right:0;top:0;bottom:0;width:56%;z-index:0;
-  background:url('img/hero.jpg') 42% center/cover no-repeat}
+.hero-photo{position:absolute;right:0;top:0;bottom:0;width:60%;z-index:0;
+  background:url('img/hero.jpg') 52% center/cover no-repeat}
 /* se funde con el papel por la izquierda y por abajo: sin corte duro */
 .hero-photo::after{content:'';position:absolute;inset:0;
   background:
@@ -142,6 +142,8 @@ nav{position:sticky;top:0;z-index:60;padding:20px clamp(22px,4vw,64px);
   .hero-photo::after{background:linear-gradient(180deg,rgba(245,241,232,.7) 0%,transparent 26%,transparent 72%,var(--paper-2) 100%)}
 }
 
+/* con #hero en flex, el wrap se encogia al contenido y se iba al centro */
+#hero > .wrap{width:100%;max-width:1580px;padding-left:clamp(22px,3.4vw,54px)}
 .hero-inner{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr);
   align-items:center;padding-bottom:clamp(40px,5vw,64px)}
 .hero-copy{max-width:min(52ch,54%)}
