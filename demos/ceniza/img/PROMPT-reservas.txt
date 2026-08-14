@@ -1,0 +1,38 @@
+PROMPT PARA GENERAR  reservas.jpg
+=================================
+Guardala en esta carpeta con el nombre exacto:  reservas.jpg
+Mientras no exista, la pagina usa salon.jpg y no se rompe nada.
+
+Formato: horizontal 16:9 (ideal 1920 x 1080)
+
+
+--- PROMPT (pegar tal cual) ---
+
+Fotografia gastronomica de alta gama, horizontal. Primer plano de una
+mesa de restaurante recien montada para dos, vista en angulo tres
+cuartos desde la altura de la mesa. Madera oscura veteada, mantel de
+lino crudo doblado, cubiertos de acero pesados alineados, dos copas de
+vino tinto a media luz y una vela baja encendida en vaso de vidrio
+ahumado. Un plato vacio de ceramica artesanal oscura espera al centro.
+Al fondo, muy desenfocado, el resplandor naranja de una parrilla de
+lena y la silueta calida de un salon con pocas mesas ocupadas.
+Iluminacion nocturna calida y direccional, sombras profundas, luz de
+fuego rebotando en el metal y el cristal. Paleta de marrones, ambar y
+naranja brasa sobre negro. Ambiente intimo, premium, sin personas
+en primer plano. Estilo editorial de revista gastronomica, 50mm,
+profundidad de campo corta, grano de pelicula sutil.
+
+--- FIN DEL PROMPT ---
+
+
+POR QUE ESTA FOTO Y NO OTRA
+---------------------------
+El bloque de arriba (la cita) ya muestra el SALON LLENO, con gente,
+plano abierto. Si abajo repetimos lo mismo se siente que no habia
+material.
+
+Esta va al reves: plano CERRADO, mesa vacia esperando. Es una silla
+guardada con tu nombre. Vende la reserva sin decir "reserva".
+
+OJO: la foto va detras de un texto claro. Por eso el lado izquierdo
+debe quedar oscuro y sin detalle importante, ahi va el titular.
