@@ -346,6 +346,29 @@ footer{background:var(--night);border-top:1px solid var(--line);padding:44px 0}
 .demo-banner img{height:19px;width:auto;display:block;flex-shrink:0}
 .demo-banner .db-home{display:inline-flex;align-items:center;gap:6px;text-decoration:none}
 .demo-banner .db-home:hover{opacity:.8}
+
+/* volver a FluyLab: siempre visible, tambien despues del scroll */
+.fluy-back{
+  position:fixed;left:20px;bottom:20px;z-index:200;
+  display:inline-flex;align-items:center;gap:10px;
+  background:rgba(12,10,9,.82);backdrop-filter:blur(16px) saturate(150%);
+  -webkit-backdrop-filter:blur(16px) saturate(150%);
+  border:1px solid rgba(242,236,227,.16);border-radius:999px;
+  padding:9px 16px 9px 12px;
+  box-shadow:0 14px 40px rgba(0,0,0,.5);
+  transition:transform .3s cubic-bezier(.16,1,.3,1),border-color .3s,box-shadow .3s;
+}
+.fluy-back:hover{transform:translateY(-2px);border-color:rgba(255,106,0,.5);
+  box-shadow:0 18px 48px rgba(0,0,0,.6)}
+.fluy-back img{height:19px;width:auto;display:block;flex-shrink:0}
+.fluy-back span{font-family:'Outfit','Space Grotesk',system-ui,sans-serif;
+  font-weight:600;font-size:12.5px;letter-spacing:.01em;color:rgba(242,236,227,.9);white-space:nowrap}
+.fluy-back svg{color:#FF6A00;flex-shrink:0;transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.fluy-back:hover svg{transform:translateX(-3px)}
+@media(max-width:560px){
+  .fluy-back{left:14px;bottom:14px;padding:8px 13px 8px 10px}
+  .fluy-back span{display:none}
+}
 </style>
 </head>
 <body>
@@ -769,5 +792,11 @@ var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 })();
 </script>
 
+
+<a href="../../index.html" class="fluy-back" aria-label="Volver al sitio de FluyLab">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+  <img src="../../assets/fluylab-logo-claro.png" alt="FluyLab">
+  <span>Volver</span>
+</a>
 </body>
 </html>
