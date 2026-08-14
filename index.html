@@ -57,15 +57,38 @@
 }
 @media(prefers-reduced-motion:reduce){.eco-dot{display:none}}
 
+/* ---- resaltador: trazo de marcador, no cambio de color ---- */
+.hl{position:relative;z-index:0;color:var(--cream);font-weight:600;
+  white-space:nowrap;padding:0 .1em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.hl::before{
+  content:'';position:absolute;z-index:-1;
+  left:-.16em;right:-.16em;top:.04em;bottom:-.06em;
+  background:linear-gradient(102deg,
+    rgba(255,106,0,.5) 0%,rgba(255,106,0,.3) 38%,
+    rgba(255,106,0,.44) 72%,rgba(255,106,0,.28) 100%);
+  /* esquinas irregulares: se ve pasada a mano, no un rectangulo */
+  border-radius:4px 10px 5px 12px;
+  transform:scaleX(0);transform-origin:left center;
+  animation:hlSweep .62s cubic-bezier(.22,1,.32,1) forwards;
+}
+.hl.h2::before{animation-delay:.34s}
+.hl.h3::before{animation-delay:.68s}
+@keyframes hlSweep{to{transform:scaleX(1)}}
+@media(prefers-reduced-motion:reduce){
+  .hl::before{animation:none;transform:scaleX(1)}
+}
+
 /* dolores */
 .pain-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:2px;
   border:1px solid var(--line);border-radius:18px;overflow:hidden}
-.pain{background:var(--surface);padding:34px 28px;transition:background .3s}
+.pain{background:var(--surface);padding:38px 32px 42px;transition:background .3s;
+  display:flex;flex-direction:column}
 .pain:hover{background:var(--s2)}
-.pain-n{font-family:var(--font-d);font-weight:700;font-size:58px;line-height:1;color:var(--orange);
-  letter-spacing:-.04em;text-shadow:0 0 60px rgba(255,106,0,.4);margin-bottom:14px}
-.pain h3{font-size:16.5px;margin-bottom:9px}
-.pain p{font-size:13.8px;color:var(--cream3);line-height:1.62}
+.pain-n{font-family:var(--font-d);font-weight:700;font-size:52px;line-height:1;color:var(--orange);
+  letter-spacing:-.04em;text-shadow:0 0 60px rgba(255,106,0,.4);margin-bottom:18px}
+.pain h3{font-size:19px;line-height:1.3;letter-spacing:-.015em;margin-bottom:14px;
+  padding-bottom:16px;border-bottom:1px solid var(--line2)}
+.pain p{font-size:14.6px;color:var(--cream3);line-height:1.72}
 
 /* tres puertas */
 .doors{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
@@ -268,7 +291,7 @@
         <div>
           <div class="eye rv">Un ecosistema, tres puertas</div>
           <h1 class="rv d1">Tu negocio no necesita otra herramienta. Necesita que <span class="gr">todo trabaje junto</span>.</h1>
-          <p class="lead rv d2">Software que elimina el trabajo repetitivo, una página web que vende de verdad y marketing que trae clientes sin depender de pauta. Entra por donde más te duela hoy.</p>
+          <p class="lead rv d2"><span class="hl">Software</span> que elimina el trabajo repetitivo, una <span class="hl h2">página web</span> que vende de verdad y <span class="hl h3">marketing</span> que trae clientes sin depender de pauta. Entra por donde más te duela hoy.</p>
           <div class="hero-actions rv d3">
             <a href="#contacto" class="btn btn-p btn-pulse">Pide tu diagnóstico</a>
             <a href="#servicios" class="btn btn-g">Ver los tres servicios</a>
@@ -317,24 +340,24 @@
     <div class="wrap">
       <div class="sec-head rv">
         <div class="eye">El problema real</div>
-        <h2 class="sec-h">El mismo problema, con distintos nombres.</h2>
-        <p class="sec-sub">No importa si vendes almuerzos, tratamientos o zapatos. Cuando el negocio crece, siempre se rompe por los mismos tres lados.</p>
+        <h2 class="sec-h">Tres formas de perder plata sin darte cuenta.</h2>
+        <p class="sec-sub">No importa si vendes almuerzos, tratamientos o zapatos. Cuando el negocio crece, siempre se rompe por los mismos tres lados. Léelas y dime cuál te suena.</p>
       </div>
       <div class="pain-grid rv d1">
         <div class="pain">
           <div class="pain-n">01</div>
-          <h3>Haces a mano lo que debería hacerse solo</h3>
-          <p>Confirmar citas, pasar inventario a un cuaderno, cuadrar turnos, armar la nómina. Horas de tu semana en tareas que ningún cliente ve.</p>
+          <h3>¿Cuántas horas de tu semana se van en tareas que no te generan ni un peso?</h3>
+          <p>Confirmar citas por WhatsApp, buscar precios en un cuaderno, cuadrar turnos de memoria, perseguir pagos, armar reportes a mano, copiar datos de un lado a otro. Todo eso se puede hacer solo: automático, sin errores, sin depender de ti. Un sistema hecho a la medida de tu negocio se encarga de lo repetitivo para que tú te encargues de lo que sí genera plata: vender, atender y crecer.</p>
         </div>
         <div class="pain">
           <div class="pain-n">02</div>
-          <h3>No sabes qué está pasando en tu negocio</h3>
-          <p>Cuánto dejó realmente el mes, qué producto se mueve, quién falló. La información existe, pero está regada en WhatsApp, Excel y la memoria de alguien.</p>
+          <h3>Si tu página no transmite confianza, es como si no existieras.</h3>
+          <p>Tal vez no tienes página y mandas todo por WhatsApp. O la tienes, pero carga lento, se ve desactualizada o no es fácil comprarte ahí. El resultado es el mismo: la gente llega, no se convence y se va. Una buena página web no es un gasto, es el lugar donde un desconocido decide si te compra o sigue de largo.</p>
         </div>
         <div class="pain">
           <div class="pain-n">03</div>
-          <h3>Cada cliente nuevo te cuesta un anuncio</h3>
-          <p>Si apagas la pauta, se apaga el teléfono. No hay una web que convierta ni una presencia que la gente recuerde y recomiende sola.</p>
+          <h3>Si no publicas, no existes. Y si publicas sin estrategia, es lo mismo.</h3>
+          <p>No se trata de vender en cada post ni de reemplazar la pauta. Se trata de que tu marca se vea viva, coherente y creíble. Que cada persona que te descubra encuentre una razón para quedarse, y que cuando esté lista para comprar, piense en ti primero.</p>
         </div>
       </div>
     </div>
