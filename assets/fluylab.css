@@ -418,3 +418,27 @@ section{padding:104px 0;position:relative}
 .pair-side h4{font-size:18px;margin-bottom:8px}
 .pair-side p{font-size:13.8px;color:var(--cream3);line-height:1.6;margin-bottom:18px}
 .pair-side:hover{background:var(--s2)}
+
+/* ============================================================
+   RESALTADOR (compartido)
+   ============================================================ */
+/* ---- resaltador: trazo de marcador, no cambio de color ---- */
+.hl{position:relative;z-index:0;color:var(--cream);font-weight:600;
+  white-space:nowrap;padding:0 .1em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.hl::before{
+  content:'';position:absolute;z-index:-1;
+  left:-.16em;right:-.16em;top:.04em;bottom:-.06em;
+  background:linear-gradient(102deg,
+    rgba(255,106,0,.5) 0%,rgba(255,106,0,.3) 38%,
+    rgba(255,106,0,.44) 72%,rgba(255,106,0,.28) 100%);
+  /* esquinas irregulares: se ve pasada a mano, no un rectangulo */
+  border-radius:4px 10px 5px 12px;
+  transform:scaleX(0);transform-origin:left center;
+  animation:hlSweep .62s cubic-bezier(.22,1,.32,1) forwards;
+}
+.hl.h2::before{animation-delay:.34s}
+.hl.h3::before{animation-delay:.68s}
+@keyframes hlSweep{to{transform:scaleX(1)}}
+@media(prefers-reduced-motion:reduce){
+  .hl::before{animation:none;transform:scaleX(1)}
+}

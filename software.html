@@ -121,6 +121,69 @@
 .price-note{font-size:14px;color:var(--cream3);margin-top:14px;line-height:1.6;max-width:46ch}
 .price-plan{font-size:15px;color:var(--cream3);margin-top:16px;line-height:1.55}
 .price-plan b{color:var(--cream);font-family:var(--font-d);font-weight:600}
+
+/* ============ cadena: cada pieza mueve la siguiente ============ */
+.chain-wrap{position:relative;border:1px solid var(--line);border-radius:20px;
+  background:radial-gradient(720px 320px at 50% -10%,rgba(255,106,0,.10),transparent 70%),
+             linear-gradient(170deg,var(--s2),var(--surface));
+  padding:clamp(30px,4vw,52px) clamp(20px,3vw,44px);overflow:hidden}
+.chain{display:flex;align-items:stretch;gap:0}
+@media(max-width:860px){.chain{flex-direction:column}}
+
+.cn{flex:1;min-width:0;position:relative;text-align:center;padding:6px 10px}
+.cn-ico{width:52px;height:52px;margin:0 auto 14px;border-radius:15px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg2);border:1px solid var(--line);color:var(--cream3);
+  transition:none}
+.cn-t{font-family:var(--font-d);font-weight:600;font-size:14.5px;color:var(--cream);margin-bottom:5px}
+.cn-s{font-size:12.6px;color:var(--cream3);line-height:1.5}
+/* el nodo se enciende cuando le llega el pulso */
+.cn .cn-ico{animation:icoOn 9.2s linear infinite;animation-delay:calc(var(--i) * 2.3s)}
+@keyframes icoOn{
+  0%{border-color:var(--line);color:var(--cream3);box-shadow:none;transform:none}
+  5%{border-color:var(--orange);color:var(--orange);box-shadow:0 0 0 6px rgba(255,106,0,.09),0 10px 30px rgba(255,106,0,.28);transform:translateY(-3px)}
+  22%{border-color:var(--orange);color:var(--orange);box-shadow:0 0 0 6px rgba(255,106,0,.09),0 10px 30px rgba(255,106,0,.28);transform:translateY(-3px)}
+  32%,100%{border-color:var(--line);color:var(--cream3);box-shadow:none;transform:none}
+}
+
+/* el cable entre nodos */
+.cw{flex:0 0 clamp(26px,4.5vw,68px);display:flex;align-items:flex-start;
+  justify-content:center;padding-top:26px;position:relative}
+.cw::before{content:'';position:absolute;top:26px;left:0;right:0;height:2px;
+  background:var(--line);border-radius:2px}
+.cw::after{content:'';position:absolute;top:22px;left:0;width:10px;height:10px;border-radius:50%;
+  background:var(--orange);box-shadow:0 0 14px rgba(255,106,0,.95);opacity:0;
+  animation:cwGo 9.2s linear infinite;animation-delay:calc(var(--i) * 2.3s + 1.35s)}
+@keyframes cwGo{
+  0%{left:0;opacity:0}
+  3%{opacity:1}
+  9%{left:calc(100% - 10px);opacity:1}
+  12%,100%{left:calc(100% - 10px);opacity:0}
+}
+@media(max-width:860px){
+  .cw{flex:0 0 46px;padding-top:0;justify-content:center;align-items:center}
+  .cw::before{top:0;bottom:0;left:50%;right:auto;width:2px;height:auto;transform:translateX(-50%)}
+  .cw::after{top:0;left:50%;transform:translateX(-50%);animation-name:cwGoV}
+  @keyframes cwGoV{
+    0%{top:0;opacity:0}
+    3%{opacity:1}
+    9%{top:calc(100% - 10px);opacity:1}
+    12%,100%{top:calc(100% - 10px);opacity:0}
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .cn .cn-ico,.cw::after{animation:none}
+  .cw::after{opacity:1;left:calc(50% - 5px)}
+}
+
+/* remate */
+.chain-foot{display:flex;align-items:center;justify-content:center;gap:11px;
+  margin-top:clamp(28px,3.4vw,44px);padding-top:clamp(24px,3vw,34px);
+  border-top:1px solid var(--line2);text-align:center;flex-wrap:wrap}
+.chain-foot b{font-family:var(--font-d);font-weight:600;font-size:15px;color:var(--cream)}
+.chain-foot span{font-size:14px;color:var(--cream3)}
+.chain-foot i{width:7px;height:7px;border-radius:50%;background:var(--orange);
+  box-shadow:0 0 12px rgba(255,106,0,.9);font-style:normal;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -149,7 +212,7 @@
         <div>
           <div class="eye rv">Puerta 2 · Software a medida</div>
           <h1 class="rv d1">Lo que hoy haces a mano, <span class="gr">el sistema lo hace solo</span>.</h1>
-          <p class="lead rv d2">Un software construido sobre tu operación real, no una plantilla donde tú te tienes que acomodar. Agenda, inventario, personal y plata, en un solo lugar y hablándose entre sí.</p>
+          <p class="lead rv d2">Un software construido sobre cómo opera tu negocio de verdad, no una plantilla donde tú te acomodas. Ventas, inventario, citas, personal, pagos, reportes: <span class="hl">tú eliges qué necesitas</span> y todo se conecta entre sí.</p>
           <div class="hero-actions rv d3">
             <a href="#contacto" class="btn btn-p btn-pulse">Pide tu diagnóstico</a>
             <a href="#modulos" class="btn btn-g">Ver los módulos</a>
@@ -204,16 +267,16 @@
     <div class="wrap">
       <div class="sec-head rv">
         <div class="eye">El costo que no ves</div>
-        <h2 class="sec-h">"Yo eso ya lo hago" también tiene precio.</h2>
+        <h2 class="sec-h">"Ya lo resuelvo a mano" también tiene precio.</h2>
         <p class="sec-sub">Nadie te cobra una factura por hacerlo a mano, pero lo estás pagando igual. Solo que lo pagas en tiempo, en errores y en cosas que se te pasan.</p>
       </div>
       <div class="cost-grid rv d1">
         <div class="cost">
           <div class="cost-h">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-            Tu tiempo, el más caro
+            Tu tiempo, el recurso más caro
           </div>
-          <p>Confirmar citas una por una, pasar ventas a un Excel, cuadrar turnos a mano. Horas de la persona que debería estar haciendo crecer el negocio.</p>
+          <p>Confirmar citas una por una, pasar ventas a un Excel, cuadrar turnos a mano, revisar pagos, reenviar datos. Horas de la persona que debería estar haciendo crecer el negocio, no operándolo.</p>
         </div>
         <div class="cost">
           <div class="cost-h">
@@ -294,6 +357,68 @@
 
   <div class="divider"></div>
 
+
+  <!-- TODO CONECTADO -->
+  <section id="conectado">
+    <div class="wrap">
+      <div class="sec-head rv">
+        <div class="eye">La diferencia real</div>
+        <h2 class="sec-h">Todo se habla entre sí. Eso es lo que cambia el juego.</h2>
+        <p class="sec-sub">Cada acción genera una cadena. No es tener diez herramientas separadas: es tener un sistema donde cada pieza mueve la siguiente.</p>
+      </div>
+
+      <div class="chain-wrap rv d1">
+        <div class="chain">
+
+          <div class="cn" style="--i:0">
+            <div class="cn-ico">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 6h18l-2 12H5L3 6Z"/><path d="M3 6 2 2H0"/><circle cx="9" cy="21" r="1"/><circle cx="17" cy="21" r="1"/></svg>
+            </div>
+            <div class="cn-t">Un vendedor registra una venta</div>
+            <div class="cn-s">Desde el mostrador o desde el celular.</div>
+          </div>
+
+          <div class="cw" style="--i:0"></div>
+
+          <div class="cn" style="--i:1">
+            <div class="cn-ico">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 16V8l-9-5-9 5v8l9 5 9-5Z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>
+            </div>
+            <div class="cn-t">El inventario se actualiza</div>
+            <div class="cn-s">Solo, en el mismo segundo.</div>
+          </div>
+
+          <div class="cw" style="--i:1"></div>
+
+          <div class="cn" style="--i:2">
+            <div class="cn-ico">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 3v18h18"/><path d="m7 15 3.5-4 3 2.5L20 7"/></svg>
+            </div>
+            <div class="cn-t">El reporte del día se arma</div>
+            <div class="cn-s">Sin que nadie copie nada a un Excel.</div>
+          </div>
+
+          <div class="cw" style="--i:2"></div>
+
+          <div class="cn" style="--i:3">
+            <div class="cn-ico">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/><path d="M16 15.5h3"/></svg>
+            </div>
+            <div class="cn-t">El cierre de caja queda listo</div>
+            <div class="cn-s">Cuadrado, a la hora que cierres.</div>
+          </div>
+
+        </div>
+
+        <div class="chain-foot">
+          <i></i>
+          <b>Tú no tocas nada.</b>
+          <span>La cadena corre sola mientras atiendes.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- VERTICALES -->
   <section>
     <div class="wrap">
@@ -352,7 +477,7 @@
         <div class="step-c">
           <div class="n">PASO 01</div>
           <h4>Te escuchamos</h4>
-          <p>Recorremos cómo funciona tu día a día y dónde se te va el tiempo de verdad.</p>
+          <p>Recorremos cómo funciona tu negocio hoy: qué haces a mano, qué te quita más tiempo y dónde estás perdiendo plata sin darte cuenta.</p>
         </div>
         <div class="step-c">
           <div class="n">PASO 02</div>
