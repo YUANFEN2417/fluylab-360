@@ -44,7 +44,7 @@ body::after{
 }
 img{max-width:100%;display:block}
 a{color:inherit;text-decoration:none}
-h1,h2,h3,h4{font-family:var(--font-d);color:var(--ink);font-weight:600;letter-spacing:-.022em;line-height:1.04}
+h1,h2,h3,h4{font-family:var(--font-d);color:var(--ink);font-weight:700;letter-spacing:-.03em;line-height:1.02}
 
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 clamp(22px,4vw,64px)}
 section{padding:clamp(72px,10vw,140px) 0}
@@ -93,38 +93,80 @@ nav{position:sticky;top:0;z-index:60;padding:20px clamp(22px,4vw,64px);
 .btn-light{background:var(--paper);color:var(--ink)}
 .btn-light:hover{background:#fff;transform:translateY(-2px)}
 
-/* ============ HERO ============ */
+/* ============ HERO editorial: la foto sangra por la derecha ============ */
 #hero{position:relative;overflow:hidden;padding-top:clamp(48px,7vw,86px);padding-bottom:0;
+  min-height:min(100dvh,880px);display:flex;align-items:center;
   background:linear-gradient(180deg,var(--paper) 0%,var(--paper) 72%,var(--paper-2) 100%)}
 #hero::before{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
   background-image:radial-gradient(circle,rgba(23,19,16,.075) 1px,transparent 1px);background-size:28px 28px;
-  mask-image:radial-gradient(ellipse 70% 65% at 55% 30%,black,transparent 76%);
-  -webkit-mask-image:radial-gradient(ellipse 70% 65% at 55% 30%,black,transparent 76%)}
-/* marca de agua: mucho más grande, pero más tenue para que siga siendo sutil */
+  mask-image:radial-gradient(ellipse 62% 58% at 34% 34%,black,transparent 76%);
+  -webkit-mask-image:radial-gradient(ellipse 62% 58% at 34% 34%,black,transparent 76%)}
+
+/* la luz como material: haz calido + motas de polvo flotando */
+.sunbeam{position:absolute;top:-18%;right:-6%;width:62%;height:130%;z-index:0;pointer-events:none;
+  background:linear-gradient(196deg,rgba(255,244,224,.95) 0%,rgba(255,236,204,.5) 34%,transparent 70%);
+  transform:rotate(-9deg);filter:blur(28px);mix-blend-mode:screen}
+.motes{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.mote{position:absolute;bottom:-8px;width:4px;height:4px;border-radius:50%;
+  background:rgba(255,255,255,.95);box-shadow:0 0 7px rgba(255,246,230,.9),0 0 2px rgba(168,62,18,.35)}
+@keyframes drift{
+  0%{transform:translateY(0) translateX(0) scale(.7);opacity:0}
+  14%{opacity:.95}
+  70%{opacity:.7}
+  100%{transform:translateY(-88vh) translateX(var(--dx,18px)) scale(1);opacity:0}
+}
+.mote{animation:drift linear infinite}
+@media(prefers-reduced-motion:reduce){.motes{display:none}.sunbeam{filter:blur(40px)}}
+
 .hero-mark{
-  position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);
+  position:absolute;left:34%;top:44%;transform:translate(-50%,-50%);
   z-index:0;pointer-events:none;user-select:none;white-space:nowrap;
-  font-family:var(--font-d);font-weight:700;font-size:min(31vw,460px);line-height:.8;
-  color:transparent;-webkit-text-stroke:1.6px rgba(23,19,16,.05);letter-spacing:-.055em;
+  font-family:var(--font-d);font-weight:700;font-size:min(29vw,420px);line-height:.8;
+  color:transparent;-webkit-text-stroke:1.6px rgba(23,19,16,.055);letter-spacing:-.055em;
   mask-image:linear-gradient(180deg,black 8%,black 58%,transparent 96%);
   -webkit-mask-image:linear-gradient(180deg,black 8%,black 58%,transparent 96%);
 }
-@media(max-width:940px){.hero-mark{top:22%;font-size:min(42vw,340px)}}
-.hero-inner{position:relative;z-index:1;display:grid;grid-template-columns:1.02fr .98fr;
-  gap:clamp(36px,5vw,80px);align-items:end;padding-bottom:clamp(56px,7vw,90px)}
-@media(max-width:940px){.hero-inner{grid-template-columns:1fr;gap:44px;align-items:start}}
-.hero-copy{padding-bottom:clamp(10px,3vw,40px)}
+@media(max-width:940px){.hero-mark{left:50%;top:20%;font-size:min(42vw,340px)}}
+
+/* la foto se sale del borde derecho, sin marco */
+.hero-photo{position:absolute;right:0;top:0;bottom:0;width:56%;z-index:0;
+  background:url('img/hero.jpg') 42% center/cover no-repeat}
+/* se funde con el papel por la izquierda y por abajo: sin corte duro */
+.hero-photo::after{content:'';position:absolute;inset:0;
+  background:
+    linear-gradient(90deg,var(--paper) 0%,rgba(245,241,232,.86) 16%,rgba(245,241,232,.24) 40%,transparent 62%),
+    linear-gradient(180deg,rgba(245,241,232,.5) 0%,transparent 22%,transparent 72%,var(--paper-2) 100%)}
+@media(max-width:940px){
+  .hero-photo{position:relative;width:100%;height:clamp(260px,48vw,420px);
+    margin-top:34px;right:auto;top:auto;bottom:auto}
+  .hero-photo::after{background:linear-gradient(180deg,rgba(245,241,232,.7) 0%,transparent 26%,transparent 72%,var(--paper-2) 100%)}
+}
+
+.hero-inner{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr);
+  align-items:center;padding-bottom:clamp(40px,5vw,64px)}
+.hero-copy{max-width:min(52ch,54%)}
+@media(max-width:940px){.hero-copy{max-width:100%}}
 .eye{font-family:var(--font-d);font-weight:600;font-size:11.5px;letter-spacing:.24em;
   text-transform:uppercase;color:var(--accent);margin-bottom:26px;display:flex;align-items:center;gap:12px}
 .eye::before{content:'';width:26px;height:1px;background:var(--accent)}
-#hero h1{font-size:clamp(44px,6.4vw,88px);line-height:.98;font-weight:700;margin-bottom:26px;max-width:12ch}
-.hero-sub{font-size:clamp(16.5px,1.4vw,18.5px);color:var(--ink-2);max-width:42ch;margin-bottom:38px;line-height:1.68}
+/* mas peso optico: en claro la tinta se ve mas delgada que al reves */
+#hero h1{font-size:clamp(46px,7vw,96px);line-height:.94;font-weight:700;
+  letter-spacing:-.038em;margin-bottom:26px;max-width:11ch}
+/* el acento del titular: color + trazo que se dibuja */
+#hero h1 .acc{position:relative;color:var(--accent);white-space:nowrap;display:inline-block}
+#hero h1 .acc::after{content:'';position:absolute;left:0;right:0;bottom:.06em;height:3px;
+  background:linear-gradient(90deg,var(--accent),rgba(168,62,18,.25));border-radius:3px;
+  transform:scaleX(0);transform-origin:left center;
+  animation:accDraw .8s cubic-bezier(.22,1,.32,1) .5s forwards}
+@keyframes accDraw{to{transform:scaleX(1)}}
+@media(prefers-reduced-motion:reduce){#hero h1 .acc::after{animation:none;transform:scaleX(1)}}
+.hero-sub{font-size:clamp(16.5px,1.4vw,18.5px);color:var(--ink-2);max-width:40ch;margin-bottom:38px;line-height:1.68}
 .hero-actions{display:flex;gap:14px;flex-wrap:wrap}
-.hero-visual{position:relative}
-.hero-visual .ph,.hero-visual img{width:100%;aspect-ratio:4/5;object-fit:cover}
-.hero-price{position:absolute;left:-26px;bottom:36px;background:var(--paper-3);
-  border:1px solid var(--line);padding:16px 24px;box-shadow:0 24px 60px rgba(23,19,16,.12)}
-@media(max-width:600px){.hero-price{left:14px;bottom:14px}}
+/* ficha del modelo: sombra calida, nunca gris */
+.hero-price{display:inline-block;margin-top:34px;background:rgba(251,249,244,.82);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid var(--line);padding:16px 24px;
+  box-shadow:0 20px 44px rgba(94,52,24,.14),0 2px 6px rgba(94,52,24,.06)}
 .hero-price .n{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
 .hero-price .p{font-family:var(--font-d);font-weight:700;font-size:21px;color:var(--ink)}
 
@@ -233,7 +275,9 @@ nav{position:sticky;top:0;z-index:60;padding:20px clamp(22px,4vw,64px);
 .col-rail::-webkit-scrollbar-track{background:var(--line-2)}
 .col-rail::-webkit-scrollbar-thumb{background:var(--ink-4)}
 .prod{flex:0 0 clamp(250px,23vw,330px);scroll-snap-align:center;position:relative}
-.prod-media{position:relative;overflow:hidden;margin-bottom:20px;background:var(--paper-2)}
+.prod-media{position:relative;overflow:hidden;margin-bottom:20px;background:var(--paper-2);
+  box-shadow:0 14px 34px rgba(94,52,24,.10);transition:box-shadow .5s var(--ease),transform .5s var(--ease)}
+.prod:hover .prod-media{box-shadow:0 26px 60px rgba(94,52,24,.19);transform:translateY(-4px)}
 .prod-media .ph,.prod-media img{width:100%;aspect-ratio:4/5;object-fit:cover;
   transition:transform .9s var(--ease)}
 .prod:hover .prod-media img,.prod:hover .prod-media .ph{transform:scale(1.05)}
@@ -333,22 +377,29 @@ footer{background:var(--ink);border-top:1px solid rgba(245,241,232,.09);padding:
 
   <!-- ===== HERO ===== -->
   <section id="hero">
+    <div class="hero-photo" role="img" aria-label="Modelo Bucaramanga sobre el cuero del taller"></div>
+    <div class="sunbeam" aria-hidden="true"></div>
+    <div class="motes" aria-hidden="true">
+      <span class="mote" style="left:14%;--dx:26px;animation-duration:19s;animation-delay:0s"></span>
+      <span class="mote" style="left:23%;--dx:-18px;animation-duration:24s;animation-delay:3.2s"></span>
+      <span class="mote" style="left:38%;--dx:22px;animation-duration:21s;animation-delay:6.4s"></span>
+      <span class="mote" style="left:52%;--dx:-24px;animation-duration:26s;animation-delay:1.8s"></span>
+      <span class="mote" style="left:64%;--dx:16px;animation-duration:18s;animation-delay:8.1s"></span>
+      <span class="mote" style="left:73%;--dx:-20px;animation-duration:23s;animation-delay:4.6s"></span>
+      <span class="mote" style="left:86%;--dx:24px;animation-duration:27s;animation-delay:10.3s"></span>
+    </div>
     <div class="hero-mark" aria-hidden="true">ALMA</div>
     <div class="wrap">
       <div class="hero-inner">
         <div class="hero-copy">
           <div class="eye rv">Calzado hecho a mano, Santander</div>
-          <h1 class="rv d1">La perfección no admite atajos.</h1>
+          <h1 class="rv d1">La <span class="acc">perfección</span> no admite atajos.</h1>
           <p class="hero-sub rv d2">Cuero curtido de forma natural, hormas propias y un taller familiar donde cada par se termina cuando está listo.</p>
           <div class="hero-actions rv d3">
             <a href="#coleccion" class="btn btn-p">Ver la colección</a>
             <a href="#proceso" class="btn btn-g">Conocer el proceso</a>
           </div>
-        </div>
-        <div class="hero-visual rv d2">
-          <img src="img/hero.jpg" alt="Modelo Bucaramanga"
-               onerror="var d=document.createElement('div');d.className='ph';d.setAttribute('data-ph','IMG-HERO: Bucaramanga, fondo neutro');d.style.aspectRatio='4/5';this.replaceWith(d);">
-          <div class="hero-price">
+          <div class="hero-price rv d3">
             <div class="n">Modelo Bucaramanga</div>
             <div class="p">$318.000</div>
           </div>
