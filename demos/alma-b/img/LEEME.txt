@@ -1,33 +1,23 @@
-IMAGENES DE LA DEMO ALMA (opcion clara y opcion oscura)
-=======================================================
+IMAGENES DE LA DEMO ALMA
+========================
 
-Suelta aqui los archivos con EXACTAMENTE estos nombres.
-La pagina los detecta sola: si el archivo existe se muestra,
-si no existe queda el patron de respaldo con su etiqueta.
+TODAS MONTADAS (14-ago-2026). Las mismas fotos van en alma y alma-b.
 
-  hero.jpg                     ->  Foto principal, modelo Bucaramanga.
-                                   Vertical, fondo neutro. Minimo 1200px de ancho.
-
-  proceso-01.jpg               ->  Corte del cuero a mano, mesa de taller.
-  proceso-02.jpg               ->  Costura sobre la horma.
-  proceso-03.jpg               ->  Acabado y sellado del cuero.
-  proceso-04.jpg               ->  Revision final par por par.
-  proceso-05.jpg               ->  Empaque de la caja de marca.
-                                   Estas cinco se ven A PANTALLA COMPLETA,
-                                   asi que entre mas grandes mejor (1600px+).
-                                   Horizontales funcionan mejor que verticales.
-
+  hero.jpg                     ->  Foto de fondo del Hero (la version clara lo usa dentro de su marco editorial)
+  proceso-01.jpg .. 05.jpg     ->  Los 5 pasos del taller
   producto-giron.jpg           ->  Modelo Giron
   producto-floridablanca.jpg   ->  Modelo Floridablanca
   producto-piedecuesta.jpg     ->  Modelo Piedecuesta
   producto-barichara.jpg       ->  Modelo Barichara
   producto-sangil.jpg          ->  Modelo San Gil
-  producto-guane.jpg           ->  Modelo Guane
-                                   Verticales, se recortan solas a 4:5.
+  producto-bucaramanga.jpg     ->  Modelo Bucaramanga
 
-NOTAS
------
-- Sirven .jpg, .png o .webp, pero el nombre debe terminar en .jpg tal cual.
-  Si tu archivo es .png, renombralo a .jpg o avisame y cambio la referencia.
-- Estas mismas fotos sirven para la version oscura (demos/alma).
-  Cuando las tengas, avisame y las conecto alli tambien.
+NOTA: antes existia "Modelo Guane". Como no habia foto de Guane
+pero si de Bucaramanga, se cambio el nombre del modelo en las dos
+versiones de la pagina. Ya no queda ninguna mencion a Guane.
+
+IMPORTANTE: si cambias una foto aqui, cambiala tambien en
+la carpeta de la otra version (alma-b/img/ o alma/img/).
+Las dos paginas usan los mismos nombres de archivo.
+
+Despues, doble clic en PUBLICAR.bat (raiz del proyecto).

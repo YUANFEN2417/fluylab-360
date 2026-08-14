@@ -1,35 +1,30 @@
 IMAGENES DE LA DEMO CENIZA
 ==========================
 
-Suelta aqui los archivos con EXACTAMENTE estos nombres.
-La pagina los detecta sola: si el archivo existe se muestra,
-si no existe queda el patron de respaldo con su etiqueta.
+TODAS MONTADAS (14-ago-2026). Ya no falta ninguna.
 
-  carnes.jpg    ->  Costillas a la brasa (la foto grande de la parrilla)
-                    Tarjeta principal del menu. Formato horizontal.
+  carnes.jpg    ->  Carnes a la brasa       (tarjeta grande del mosaico)
+  mar.jpg       ->  Delicias del mar
+  postres.jpg   ->  Postres de fuego
+  bebidas.jpg   ->  Bebidas frescas
+  salon.jpg     ->  Reservas  (se usa en la seccion experiencia
+                    y de fondo en el bloque de reservas)
 
-  mar.jpg       ->  Pulpo al carbon (el plato blanco con el pulpo)
-                    Categoria "Delicias del mar".
+SI QUIERES RECUPERAR "CORTES DE LA CASA"
+----------------------------------------
+Esa categoria se quito porque no habia foto para ella y un recuadro
+gris entre cuatro fotos reales se ve como pagina sin terminar.
+Para devolverla: deja aqui la foto como cortes.jpg y avisame,
+vuelvo a poner la tarjeta y reajusto el mosaico.
 
-  cortes.jpg    ->  Cortes de la casa (FALTA, no me la has pasado)
-                    Idea: un corte grande partido, o la tabla para compartir.
+COMO REEMPLAZAR UNA FOTO
+------------------------
+Deja el archivo nuevo con el mismo nombre, encima del que ya esta.
+Despues doble clic en PUBLICAR.bat (esta en la raiz del proyecto).
 
-  postres.jpg   ->  Postres de fuego (los citricos flameados con helado)
-                    Categoria "Postres de fuego".
-
-  bebidas.jpg   ->  Bebidas frescas (FALTA, no me la has pasado)
-                    Idea: limonada de la casa o la carta corta de vinos.
-
-  salon.jpg     ->  Salon del restaurante (la foto del interior con las mesas)
-                    Se usa en DOS lugares: la seccion "experiencia"
-                    y el fondo de la seccion de reservas.
-
-NOTAS
------
-- Sirven .jpg, .png o .webp, pero el nombre del archivo debe terminar en .jpg
-  tal cual esta arriba. Si tu archivo es .png, o lo renombras a .jpg,
-  o me avisas y yo cambio la referencia en el HTML.
-- Recomendado: ancho de 1600px o mas en carnes.jpg y salon.jpg,
-  que son las que se ven grandes.
-- Las fotos verticales (pulpo, postre) se recortan solas al centro,
-  no hay que editarlas.
+OJO CON EL PESO
+---------------
+Las fotos originales pesaban entre 2 y 4 MB cada una. Aqui estan
+optimizadas a menos de 150 KB sin perder calidad visible.
+Si subes una foto pesada tal cual, la pagina se vuelve lenta en
+celular. Avisame y la optimizo yo.

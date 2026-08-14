@@ -142,19 +142,18 @@
   }
   @media (max-width:1000px){.cat-grid{grid-template-columns:repeat(4,1fr);grid-auto-rows:210px}}
   @media (max-width:660px){.cat-grid{grid-template-columns:1fr;grid-auto-rows:250px}}
-  /* reparto: 2 grandes arriba, 3 abajo */
+  /* reparto: la insignia manda arriba, el mar la acompaña a lo alto, dos abajo */
   .cat-a{grid-column:span 4;grid-row:span 2}
-  .cat-b{grid-column:span 2;grid-row:span 1}
-  .cat-c{grid-column:span 2;grid-row:span 1}
+  .cat-b{grid-column:span 2;grid-row:span 2}
   .cat-d{grid-column:span 3;grid-row:span 1}
   .cat-e{grid-column:span 3;grid-row:span 1}
   @media (max-width:1000px){
     .cat-a{grid-column:span 4;grid-row:span 2}
-    .cat-b,.cat-c{grid-column:span 2}
+    .cat-b{grid-column:span 4;grid-row:span 1}
     .cat-d,.cat-e{grid-column:span 2}
   }
   @media (max-width:660px){
-    .cat-a,.cat-b,.cat-c,.cat-d,.cat-e{grid-column:span 1;grid-row:span 1}
+    .cat-a,.cat-b,.cat-d,.cat-e{grid-column:span 1;grid-row:span 1}
   }
 
   .cat{
@@ -318,12 +317,10 @@
     <div class="marquee-track">
       <span>Carnes a la brasa</span>
       <span>Delicias del mar</span>
-      <span>Cortes de la casa</span>
       <span>Postres de fuego</span>
       <span>Bebidas frescas</span>
       <span>Carnes a la brasa</span>
       <span>Delicias del mar</span>
-      <span>Cortes de la casa</span>
       <span>Postres de fuego</span>
       <span>Bebidas frescas</span>
     </div>
@@ -362,19 +359,6 @@
           <div class="cat-kicker">Del muelle a la brasa</div>
           <div class="cat-name">Delicias del mar</div>
           <p class="cat-desc">Pulpo al carbón, pesca del día y mariscos que solo entran si llegaron frescos esa mañana.</p>
-        </div>
-      </a>
-
-      <a href="#reservas" class="cat cat-c">
-        <div class="cat-img">
-          <img src="img/cortes.jpg" alt="Cortes de la casa" loading="lazy"
-               onerror="this.parentElement.classList.add('pending');this.parentElement.dataset.ph='IMG: cortes de la casa';this.remove();">
-        </div>
-        <div class="cat-shade"></div>
-        <div class="cat-body">
-          <div class="cat-kicker">Para compartir</div>
-          <div class="cat-name">Cortes de la casa</div>
-          <p class="cat-desc">Piezas grandes maduradas en casa, pensadas para partir en la mitad de la mesa.</p>
         </div>
       </a>
 
