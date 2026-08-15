@@ -184,6 +184,39 @@
 .chain-foot span{font-size:14px;color:var(--cream3)}
 .chain-foot i{width:7px;height:7px;border-radius:50%;background:var(--orange);
   box-shadow:0 0 12px rgba(255,106,0,.9);font-style:normal;flex-shrink:0}
+
+/* demos de software */
+.sdemo{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;
+  border:1px solid var(--line);border-radius:20px;overflow:hidden}
+@media(max-width:900px){.sdemo{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){.sdemo{grid-template-columns:1fr}}
+.sd{background:var(--surface);display:flex;flex-direction:column;transition:background .3s}
+.sd:hover{background:var(--s2)}
+.sd-art{position:relative;height:150px;overflow:hidden;flex-shrink:0;border-bottom:1px solid var(--line);
+  background:radial-gradient(300px 160px at 66% 18%,rgba(255,106,0,.12),transparent 72%),
+             linear-gradient(160deg,var(--s2),var(--surface))}
+/* maqueta de panel dentro de cada tarjeta */
+.sd-win{position:absolute;left:22px;right:22px;top:26px;bottom:-1px;border-radius:8px 8px 0 0;
+  background:var(--bg2);border:1px solid var(--line);border-bottom:none;overflow:hidden;
+  transition:transform .5s var(--ease)}
+.sd:hover .sd-win{transform:translateY(-5px)}
+.sd-bar{height:15px;background:var(--s3);display:flex;align-items:center;gap:4px;padding:0 8px;
+  border-bottom:1px solid var(--line)}
+.sd-bar i{width:4px;height:4px;border-radius:50%;background:var(--cream4)}
+.sd-rows{padding:11px 12px;display:flex;flex-direction:column;gap:7px}
+.sd-rows span{display:block;height:6px;border-radius:3px;background:rgba(243,237,228,.13)}
+.sd-rows span.w1{width:78%}.sd-rows span.w2{width:52%}.sd-rows span.w3{width:66%}
+.sd-rows span.hot{background:var(--orange);width:38%;box-shadow:0 3px 12px rgba(255,106,0,.45)}
+.sd-body{padding:24px 24px 28px;display:flex;flex-direction:column;flex:1}
+.sd-tag{font-family:var(--font-d);font-weight:600;font-size:10.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--orange);margin-bottom:10px}
+.sd h3{font-size:17px;margin-bottom:8px}
+.sd p{font-size:13.6px;color:var(--cream3);line-height:1.6;margin-bottom:18px;flex:1}
+.sd .go{font-family:var(--font-d);font-weight:600;font-size:13px;color:var(--orange);
+  display:inline-flex;align-items:center;gap:6px}
+.sd:hover .go svg{transform:translateX(3px)}
+.sd .go svg{transition:transform .3s var(--ease)}
+.sdemo-note{margin-top:22px;font-size:13.5px;color:var(--cream4);line-height:1.6;text-align:center}
 </style>
 </head>
 <body>
@@ -195,6 +228,7 @@
     <a href="web.html">Página web</a>
     <a href="software.html" class="on">Software</a>
     <a href="marketing.html">Marketing</a>
+    <a href="#simuladores">Simuladores</a>
     <a href="#precio">Precio</a>
   </div>
   <a href="#contacto" class="btn btn-p" style="padding:11px 20px;font-size:13.5px">Pide tu diagnóstico</a>
@@ -495,6 +529,79 @@
           <p>Capacitación de tu equipo, ajustes y soporte. El sistema evoluciona contigo.</p>
         </div>
       </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- DEMOS DE SOFTWARE -->
+  <section id="simuladores">
+    <div class="wrap">
+      <div class="sec-head rv">
+        <div class="eye">Ábrelo tú mismo</div>
+        <h2 class="sec-h">No te contamos cómo funciona. Entra y úsalo.</h2>
+        <p class="sec-sub">Sistemas reales que hemos construido, con los datos cambiados y la marca del cliente protegida. Puedes navegarlos completos, sin registrarte ni dejar tus datos.</p>
+      </div>
+      <div class="sdemo">
+        <a href="demos/software/ferreteria/index.html" class="sd rv d1">
+          <div class="sd-art" aria-hidden="true">
+            <div class="sd-win">
+              <div class="sd-bar"><i></i><i></i><i></i></div>
+              <div class="sd-rows">
+                <span class="w1"></span><span class="w2"></span>
+                <span class="hot"></span><span class="w3"></span><span class="w2"></span>
+              </div>
+            </div>
+          </div>
+          <div class="sd-body">
+            <div class="sd-tag">Ferretería y eléctricos</div>
+            <h3>Catálogo, CRM e inventario</h3>
+            <p>El más completo de los tres. Catálogo con precios por cliente, seguimiento de cotizaciones, inventario, facturación y hasta el entrenamiento del equipo.</p>
+            <span class="go">Abrir el simulador
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+          </div>
+        </a>
+        <a href="demos/software/muebles/index.html" class="sd rv d2">
+          <div class="sd-art" aria-hidden="true">
+            <div class="sd-win">
+              <div class="sd-bar"><i></i><i></i><i></i></div>
+              <div class="sd-rows">
+                <span class="w1"></span><span class="w2"></span>
+                <span class="hot"></span><span class="w3"></span><span class="w2"></span>
+              </div>
+            </div>
+          </div>
+          <div class="sd-body">
+            <div class="sd-tag">Mueblería</div>
+            <h3>Producción, costos y abonos</h3>
+            <p>Catálogo por línea y color, control de costos contra precio de venta, alertas cuando un proveedor sube, y cobros pendientes por cliente.</p>
+            <span class="go">Abrir el simulador
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+          </div>
+        </a>
+        <a href="demos/software/estetica/index.html" class="sd rv d3">
+          <div class="sd-art" aria-hidden="true">
+            <div class="sd-win">
+              <div class="sd-bar"><i></i><i></i><i></i></div>
+              <div class="sd-rows">
+                <span class="w1"></span><span class="w2"></span>
+                <span class="hot"></span><span class="w3"></span><span class="w2"></span>
+              </div>
+            </div>
+          </div>
+          <div class="sd-body">
+            <div class="sd-tag">Salón de belleza</div>
+            <h3>Agenda, comisiones y clientas</h3>
+            <p>Agenda del día, historial de cada clienta, comisiones por profesional calculadas solas y cierre de caja al final del turno.</p>
+            <span class="go">Abrir el simulador
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+          </div>
+        </a>
+      </div>
+      <p class="sdemo-note">Son sistemas de clientes reales. Cambiamos los nombres y los datos porque su información es suya, no material de venta nuestro.</p>
     </div>
   </section>
 

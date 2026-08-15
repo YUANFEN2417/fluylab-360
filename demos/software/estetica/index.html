@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estudio Ámbar · Sistema FluyLab — Simulador</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Cormorant+Garamond:ital,wght@1,400;1,500&family=Barlow+Condensed:ital,wght@1,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0A0A08;          /* sidebar / deep text */
+    --orange:#CF661D;       /* action */
+    --orange-soft:#F4E2D2;
+    --cream:#FFF9E6;
+    --canvas:#FAF6EE;       /* main bg */
+    --card:#FFFFFF;
+    --gray:#706C61;         /* muted */
+    --line:#EAE3D6;
+    --mauve:#C9968F;        /* beauty accent */
+    --rose:#D9A7AC;
+    --plum:#A87C8C;
+    --taupe:#B7A48C;
+    --sand:#CBB89A;
+    --green:#5E8C6A;
+    --shadow:0 1px 2px rgba(20,16,8,.04), 0 8px 24px rgba(20,16,8,.06);
+    --r:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"DM Sans",sans-serif;color:var(--ink);background:var(--canvas);
+    font-weight:400;-webkit-font-smoothing:antialiased;line-height:1.5;
+  }
+  .serif{font-family:"Cormorant Garamond",serif;font-style:italic;font-weight:500}
+  h1,h2,h3,h4{font-family:"Outfit",sans-serif;margin:0;letter-spacing:-.01em}
+
+  /* ===== App shell ===== */
+  .app{display:flex;min-height:100vh}
+  .sidebar{
+    width:248px;background:var(--ink);color:#E9E4DA;flex-shrink:0;
+    display:flex;flex-direction:column;position:sticky;top:0;height:100vh;
+  }
+  .brand{padding:26px 24px 18px}
+  .brand .logo{font-family:"Barlow Condensed",sans-serif;font-style:italic;font-weight:600;
+    font-size:30px;letter-spacing:.5px;color:var(--cream);line-height:1}
+  .brand .logo b{color:var(--mauve);font-weight:600}
+  .brand .sub{font-size:11px;color:#827d72;margin-top:6px;letter-spacing:.04em}
+  .brand .sub b{color:var(--orange);font-weight:600}
+  nav{padding:8px 14px;flex:1;overflow-y:auto}
+  .nav-eyebrow{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#615d54;
+    padding:16px 10px 8px}
+  .nav-item{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;
+    color:#C8C2B6;cursor:pointer;font-size:14.5px;font-weight:500;transition:.15s;margin-bottom:2px}
+  .nav-item svg{width:18px;height:18px;stroke:currentColor;flex-shrink:0}
+  .nav-item:hover{background:#16150f;color:#F0EBE0}
+  .nav-item.active{background:var(--orange);color:#fff}
+  .nav-item .badge{margin-left:auto;background:#fff;color:var(--orange);font-size:11px;
+    font-weight:700;min-width:18px;height:18px;border-radius:9px;display:grid;place-items:center;padding:0 5px}
+  .nav-item:not(.active) .badge{background:var(--orange);color:#fff}
+  .who{padding:16px 22px;border-top:1px solid #1d1b14;display:flex;align-items:center;gap:11px}
+  .who .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--mauve),var(--orange));
+    display:grid;place-items:center;color:#fff;font-weight:700;font-family:"Outfit";font-size:14px}
+  .who .nm{font-size:13.5px;font-weight:600;color:#EDE8DE}
+  .who .rl{font-size:11px;color:#7c776c}
+
+  /* ===== Main ===== */
+  main{flex:1;min-width:0}
+  .topbar{display:flex;align-items:center;gap:16px;padding:20px 34px;border-bottom:1px solid var(--line);
+    background:var(--canvas);position:sticky;top:0;z-index:20}
+  .topbar .ttl{flex:1}
+  .topbar h1{font-size:23px;font-weight:700}
+  .topbar .date{font-size:13px;color:var(--gray);margin-top:2px}
+  .content{padding:30px 34px 70px;max-width:1160px}
+  .screen{display:none;animation:fade .35s ease}
+  .screen.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.screen.active{animation:none}*{transition:none!important}}
+
+  /* buttons */
+  .btn{font-family:"DM Sans";font-size:13.5px;font-weight:600;border-radius:10px;padding:10px 16px;
+    border:1px solid transparent;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:.15s}
+  .btn svg{width:16px;height:16px;stroke:currentColor}
+  .btn-primary{background:var(--orange);color:#fff}
+  .btn-primary:hover{background:#b85716}
+  .btn-ghost{background:#fff;color:var(--ink);border-color:var(--line)}
+  .btn-ghost:hover{border-color:var(--mauve)}
+  .btn-sm{padding:7px 12px;font-size:12.5px}
+
+  /* helper notes toggle */
+  .notes-toggle{margin-left:auto;display:flex;align-items:center;gap:9px;font-size:13px;color:var(--gray)}
+  .switch{width:38px;height:22px;border-radius:12px;background:var(--line);position:relative;cursor:pointer;transition:.2s;flex-shrink:0}
+  .switch::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+  .switch.on{background:var(--orange)}
+  .switch.on::after{left:19px}
+  .note{display:none;background:#FBF3E6;border:1px dashed var(--orange);border-radius:10px;
+    padding:10px 13px;font-size:12.5px;color:#8a5a2a;margin:10px 0}
+  body.show-notes .note{display:block}
+  .note b{color:var(--orange)}
+
+  /* cards / grid */
+  .grid{display:grid;gap:18px}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+  .card.pad{padding:20px}
+  .eyebrow{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--gray);font-weight:600}
+  .sec-head{display:flex;align-items:flex-end;gap:14px;margin:0 0 16px}
+  .sec-head .lead{flex:1}
+  .sec-head h2{font-size:20px;font-weight:700}
+  .sec-head .desc{font-size:14px;color:var(--gray);margin-top:3px}
+
+  /* stat cards */
+  .stat .lbl{font-size:12.5px;color:var(--gray);font-weight:500;display:flex;align-items:center;gap:7px}
+  .stat .dot{width:8px;height:8px;border-radius:50%}
+  .stat .num{font-family:"Outfit";font-size:30px;font-weight:700;margin-top:8px;line-height:1}
+  .stat .sub{font-size:12px;color:var(--gray);margin-top:6px}
+  .split{display:flex;gap:6px;margin-top:10px;font-size:12px}
+  .split span{flex:1;text-align:center;padding:5px;border-radius:7px;font-weight:600}
+  .pill-wa{background:#E3F0E7;color:#3f6b4c}
+  .pill-fis{background:#F1E7DD;color:#8a5a2a}
+
+  /* lists */
+  .row{display:flex;align-items:center;gap:13px;padding:13px 0;border-bottom:1px solid var(--line)}
+  .row:last-child{border-bottom:none}
+  .time{font-family:"Outfit";font-weight:700;font-size:14px;width:62px;color:var(--ink)}
+  .swatch{width:4px;height:34px;border-radius:3px;flex-shrink:0}
+  .row .main{flex:1;min-width:0}
+  .row .main .t{font-weight:600;font-size:14px}
+  .row .main .s{font-size:12.5px;color:var(--gray)}
+  .tag{font-size:11px;font-weight:600;padding:4px 9px;border-radius:20px;white-space:nowrap}
+  .t-wa{background:#E3F0E7;color:#3f6b4c}
+  .t-fis{background:#F1E7DD;color:#8a5a2a}
+  .t-mauve{background:#F3E5E3;color:#9c6e68}
+  .t-orange{background:#FBE6D4;color:#b85716}
+  .t-green{background:#E3F0E7;color:#3f6b4c}
+  .t-gray{background:#EEEAE1;color:var(--gray)}
+
+  /* alerts strip */
+  .alert{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;font-size:13.5px}
+  .alert b{font-weight:700}
+  .alert-mauve{background:#F6EAE8;color:#8a5a52}
+  .alert-orange{background:#FBEEDD;color:#9a5a1f}
+  .alert .ic{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;flex-shrink:0;background:#fff}
+  .alert .ic svg{width:16px;height:16px}
+  .alert .go{margin-left:auto;font-weight:700;font-size:12.5px;cursor:pointer;text-decoration:underline}
+
+  /* ===== Agenda grid ===== */
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+  .chip{padding:8px 14px;border-radius:20px;border:1px solid var(--line);background:#fff;font-size:13px;
+    font-weight:600;cursor:pointer;transition:.15s;color:var(--gray)}
+  .chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .chip:hover:not(.active){border-color:var(--mauve)}
+  .agenda{display:grid;grid-template-columns:54px repeat(3,1fr);border:1px solid var(--line);
+    border-radius:var(--r);overflow:hidden;background:#fff;box-shadow:var(--shadow);margin-top:8px}
+  .agenda.cols2{grid-template-columns:54px repeat(2,1fr)}
+  .agenda.cols1{grid-template-columns:54px 1fr}
+  .col-head{padding:13px 12px;font-family:"Outfit";font-weight:600;font-size:13.5px;text-align:center;
+    border-bottom:1px solid var(--line);border-left:1px solid var(--line);background:#FCFAF5}
+  .col-head:first-child{border-left:none}
+  .col-head .sv{display:block;font-size:11px;font-weight:500;color:var(--gray);margin-top:2px;font-family:"DM Sans"}
+  .hr{font-size:11px;color:var(--gray);text-align:right;padding:9px 8px 0 0;border-top:1px solid #F3EEE4}
+  .cell{border-left:1px solid var(--line);border-top:1px solid #F3EEE4;min-height:46px;padding:4px;position:relative}
+  .appt{border-radius:8px;padding:6px 8px;font-size:11.5px;line-height:1.25;color:#fff;cursor:pointer;height:100%;
+    display:flex;flex-direction:column;justify-content:center;transition:.15s}
+  .appt:hover{filter:brightness(1.06)}
+  .appt .who2{font-weight:700}
+  .free{font-size:11px;color:#bcae97;display:grid;place-items:center;height:100%;cursor:pointer;border-radius:8px}
+  .free:hover{background:#FBF3E6;color:var(--orange)}
+  .free.blocked{color:#d6b5b0;cursor:not-allowed}
+  .free.blocked:hover{background:transparent}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;font-size:12px;color:var(--gray)}
+  .legend span{display:flex;align-items:center;gap:6px}
+  .legend i{width:11px;height:11px;border-radius:3px}
+
+  /* ===== Asistente ===== */
+  .chat{max-width:640px;margin-top:8px}
+  .chat-box{background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);
+    height:430px;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
+  .msg{max-width:78%;padding:11px 14px;border-radius:14px;font-size:13.5px;line-height:1.45}
+  .msg.user{align-self:flex-end;background:var(--orange);color:#fff;border-bottom-right-radius:4px}
+  .msg.bot{align-self:flex-start;background:#F2ECE0;color:var(--ink);border-bottom-left-radius:4px}
+  .msg.bot b{color:var(--orange)}
+  .appt-chip{align-self:flex-start;background:#fff;border:1px solid var(--line);border-radius:12px;
+    padding:11px 14px;max-width:78%;box-shadow:var(--shadow)}
+  .appt-chip .h{font-weight:700;font-size:13px;display:flex;align-items:center;gap:7px;margin-bottom:5px}
+  .appt-chip .h .d{width:9px;height:9px;border-radius:50%}
+  .appt-chip .ln{font-size:12.5px;color:var(--gray)}
+  .chat-input{display:flex;gap:10px;margin-top:12px}
+  .chat-input input{flex:1;padding:13px 16px;border:1px solid var(--line);border-radius:12px;font-family:"DM Sans";
+    font-size:14px;background:#fff}
+  .chat-input input:focus{outline:none;border-color:var(--orange)}
+  .quick{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .quick button{font-size:12.5px;color:var(--gray);background:#fff;border:1px solid var(--line);
+    border-radius:20px;padding:7px 13px;cursor:pointer}
+  .quick button:hover{border-color:var(--orange);color:var(--orange)}
+
+  /* ===== Tables ===== */
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  thead th{text-align:left;font-family:"Outfit";font-weight:600;font-size:11.5px;letter-spacing:.05em;
+    text-transform:uppercase;color:var(--gray);padding:0 14px 12px}
+  tbody td{padding:13px 14px;border-top:1px solid var(--line)}
+  tbody tr{cursor:pointer}
+  tbody tr:hover{background:#FCF8F0}
+  .cname{font-weight:600}
+  .muted{color:var(--gray)}
+  .av-sm{width:30px;height:30px;border-radius:50%;display:inline-grid;place-items:center;color:#fff;
+    font-weight:700;font-size:12px;font-family:"Outfit";margin-right:10px;vertical-align:middle}
+
+  /* ===== Automatizaciones ===== */
+  .auto{display:flex;gap:16px;padding:18px 20px;align-items:flex-start}
+  .auto .ic{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;flex-shrink:0}
+  .auto .ic svg{width:21px;height:21px}
+  .auto .body{flex:1}
+  .auto .body h4{font-size:15px;font-weight:700;display:flex;align-items:center;gap:9px}
+  .auto .body p{font-size:13px;color:var(--gray);margin:5px 0 0}
+  .auto .preview{display:none;margin-top:12px;background:#F2ECE0;border-radius:10px;padding:12px 14px;
+    font-size:13px;line-height:1.5;color:#4a463c;border-left:3px solid var(--mauve)}
+  .auto.open .preview{display:block}
+  .cad{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+  .cad span{font-size:11.5px;font-weight:600;background:#FBE6D4;color:#b85716;padding:4px 10px;border-radius:20px}
+  .link{color:var(--orange);font-weight:600;font-size:12.5px;cursor:pointer;background:none;border:none;padding:0;margin-top:9px}
+
+  /* ===== Reportes ===== */
+  .bars{display:flex;align-items:flex-end;gap:14px;height:170px;padding:10px 4px 0}
+  .bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%;justify-content:flex-end}
+  .bar{width:60%;border-radius:6px 6px 0 0;background:linear-gradient(var(--mauve),var(--orange));transition:height .5s ease}
+  .bar-lbl{font-size:11.5px;color:var(--gray)}
+  .bar-val{font-size:11px;font-weight:700;color:var(--ink)}
+
+  /* ===== Modal ===== */
+  .overlay{position:fixed;inset:0;background:rgba(20,16,8,.5);display:none;place-items:center;z-index:60;padding:24px}
+  .overlay.show{display:grid}
+  .modal{background:#fff;border-radius:18px;max-width:480px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.3);
+    max-height:88vh;overflow-y:auto}
+  .modal-head{padding:22px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px}
+  .modal-head .x{margin-left:auto;cursor:pointer;color:var(--gray);font-size:22px;line-height:1;background:none;border:none}
+  .modal-body{padding:22px 24px}
+  .kv{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+  .kv:last-child{border:none}
+  .kv .k{color:var(--gray)}
+  .kv .v{font-weight:600}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:12.5px;font-weight:600;margin-bottom:6px;color:var(--ink)}
+  .field input,.field select{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;
+    font-family:"DM Sans";font-size:14px;background:#fff}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--orange)}
+
+  .empty{text-align:center;color:var(--gray);padding:30px;font-size:14px}
+
+  /* mobile */
+  .hamb{display:none}
+  @media(max-width:880px){
+    .sidebar{position:fixed;z-index:50;transform:translateX(-100%);transition:.25s;box-shadow:0 0 40px rgba(0,0,0,.4)}
+    .sidebar.open{transform:none}
+    .hamb{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer}
+    .g4,.g3,.g2{grid-template-columns:1fr 1fr}
+    .content{padding:22px 18px 60px}
+    .topbar{padding:16px 18px}
+  }
+  @media(max-width:560px){.g4,.g3,.g2{grid-template-columns:1fr}}
+  @media print{
+    .sidebar,.hamb,.notes-toggle,.note,.btn,.chips{display:none!important}
+    main{width:100%}.topbar{position:static;border:none}
+    .screen:not(.active){display:none}.content{padding:0;max-width:none}
+    body{background:#fff}.card{box-shadow:none;break-inside:avoid}
+  }
+
+/* volver a FluyLab: siempre visible */
+.fluy-back{position:fixed;left:20px;bottom:20px;z-index:2000;
+  display:inline-flex;align-items:center;gap:10px;
+  background:rgba(12,10,9,.86);backdrop-filter:blur(16px) saturate(150%);
+  -webkit-backdrop-filter:blur(16px) saturate(150%);
+  border:1px solid rgba(242,236,227,.16);border-radius:999px;padding:9px 16px 9px 12px;
+  box-shadow:0 14px 40px rgba(0,0,0,.5);text-decoration:none;
+  transition:transform .3s cubic-bezier(.16,1,.3,1),border-color .3s}
+.fluy-back:hover{transform:translateY(-2px);border-color:rgba(255,106,0,.5)}
+.fluy-back img{height:19px;width:auto;display:block;flex-shrink:0}
+.fluy-back span{font-family:system-ui,sans-serif;font-weight:600;font-size:12.5px;
+  color:rgba(242,236,227,.9);white-space:nowrap}
+.fluy-back svg{color:#FF6A00;flex-shrink:0}
+/* aviso de que esto es una demostracion */
+.demo-flag{position:fixed;top:0;left:0;right:0;z-index:2000;
+  background:#0A0908;border-bottom:1px solid rgba(255,106,0,.35);
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  padding:7px 16px;font-family:system-ui,sans-serif;font-size:12px;
+  color:rgba(243,237,228,.72);text-align:center}
+.demo-flag b{color:#FF6A00;font-weight:600}
+body{padding-top:32px !important}
+@media(max-width:560px){
+  .fluy-back{left:14px;bottom:14px;padding:8px 13px 8px 10px}
+  .fluy-back span{display:none}
+  .demo-flag{font-size:11px;padding:6px 12px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">Estudio<b>Ámbar</b></div>
+      <div class="sub">Sistema por <b>FluyLab</b></div>
+    </div>
+    <nav>
+      <div class="nav-eyebrow">Operación</div>
+      <div class="nav-item active" data-go="hoy">
+        <svg fill="none" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        Hoy
+      </div>
+      <div class="nav-item" data-go="agenda">
+        <svg fill="none" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        Agenda
+      </div>
+      <div class="nav-item" data-go="asistente">
+        <svg fill="none" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Asistente
+      </div>
+      <div class="nav-eyebrow">Clientas</div>
+      <div class="nav-item" data-go="clientas">
+        <svg fill="none" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zm14 10v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        Clientas
+      </div>
+      <div class="nav-item" data-go="auto">
+        <svg fill="none" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 4v5h5M20 20v-5h-5M20 9A8 8 0 006 5L4 7m0 10a8 8 0 0014 2l2-2"/></svg>
+        Automatizaciones
+      </div>
+      <div class="nav-eyebrow">Dinero</div>
+      <div class="nav-item" data-go="ventas">
+        <svg fill="none" stroke-width="1.8" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></svg>
+        Ventas
+      </div>
+      <div class="nav-item" data-go="comisiones">
+        <svg fill="none" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        Comisiones
+      </div>
+      <div class="nav-item" data-go="reportes">
+        <svg fill="none" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 3v18h18M18 17V9M13 17V5M8 17v-3"/></svg>
+        Reportes
+      </div>
+    </nav>
+    <div class="who">
+      <div class="av">D</div>
+      <div><div class="nm">Dani Beltrán</div><div class="rl">Dueña · Estudio Ámbar</div></div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main>
+    <div class="topbar">
+      <div class="hamb" id="hamb"><svg width="18" height="18" fill="none" stroke="#0A0A08" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></div>
+      <div class="ttl">
+        <h1 id="pageTitle">Hoy</h1>
+        <div class="date">Lunes, 22 de junio de 2026</div>
+      </div>
+      <div class="notes-toggle">
+        <span>Notas de demo</span>
+        <div class="switch" id="notesSwitch"></div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ===== HOY ===== -->
+      <section class="screen active" data-screen="hoy">
+        <div class="note">Esta es la pantalla de inicio de Dani. <b>De un vistazo</b> ve su día: cuántas citas, cuánto vendió, qué tiene pendiente. Todo lo demás del sistema cuelga del menú izquierdo.</div>
+
+        <div class="grid g4" style="margin-bottom:18px">
+          <div class="card pad stat">
+            <div class="lbl">Citas de hoy</div>
+            <div class="num">6</div>
+            <div class="split"><span class="pill-wa">4 WhatsApp</span><span class="pill-fis">2 físico</span></div>
+          </div>
+          <div class="card pad stat">
+            <div class="lbl">Ventas del día</div>
+            <div class="num">$375.000</div>
+            <div class="sub">Estimado según servicios agendados</div>
+          </div>
+          <div class="card pad stat">
+            <div class="lbl"><span class="dot" style="background:var(--orange)"></span>Abonos por aprobar</div>
+            <div class="num">2</div>
+            <div class="sub">Esperan tu confirmación por WhatsApp</div>
+          </div>
+          <div class="card pad stat">
+            <div class="lbl"><span class="dot" style="background:var(--mauve)"></span>Comisiones de hoy</div>
+            <div class="num">$150.000</div>
+            <div class="sub">A repartir entre 3 profesionales</div>
+          </div>
+        </div>
+
+        <div class="grid g2" style="align-items:start">
+          <div class="card pad">
+            <div class="sec-head"><div class="lead"><div class="eyebrow">Agenda de hoy</div><h2 style="font-size:17px;margin-top:6px">Próximas citas</h2></div></div>
+            <div id="hoyList"></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="note" style="margin:0">Estas alertas las arma el sistema solo, leyendo la base de datos. Son <b>plata que normalmente se pierde</b> si nadie está pendiente.</div>
+            <div class="alert alert-orange">
+              <div class="ic"><svg fill="none" stroke="#9a5a1f" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+              <div><b>3 clientas</b> listas para retoque de uñas</div>
+              <span class="go" data-go="clientas">Ver</span>
+            </div>
+            <div class="alert alert-mauve">
+              <div class="ic"><svg fill="none" stroke="#8a5a52" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20 12v9H4v-9M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg></div>
+              <div><b>2 cumpleañeras</b> este mes sin agendar</div>
+              <span class="go" data-go="clientas">Ver</span>
+            </div>
+            <div class="alert alert-orange">
+              <div class="ic"><svg fill="none" stroke="#9a5a1f" stroke-width="1.8" viewBox="0 0 24 24"><path d="M2 3h20v14H2zM2 21h20M8 17v4M16 17v4"/></svg></div>
+              <div><b>2 abonos</b> esperan tu visto bueno</div>
+              <span class="go" data-go="agenda">Revisar</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== AGENDA ===== -->
+      <section class="screen" data-screen="agenda">
+        <div class="note">El corazón del sistema. <b>Un calendario por profesional.</b> Abajo prueba el filtro "por servicio": fíjate que a las 4:00 Daniela aparece ocupada para cejas, porque a esa hora está haciendo uñas. <b>Nunca se sobrepone una cita.</b></div>
+
+        <div class="sec-head">
+          <div class="lead"><div class="eyebrow">Lunes 22 de junio</div><h2>Agenda del día</h2><div class="desc">Filtra por profesional o mira la disponibilidad real de un servicio.</div></div>
+          <button class="btn btn-primary" data-go="asistente"><svg fill="none" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Nueva cita</button>
+        </div>
+
+        <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;margin-bottom:4px">
+          <div class="chips" id="proChips">
+            <div class="chip active" data-pro="all">Todas</div>
+            <div class="chip" data-pro="Daniela">Daniela</div>
+            <div class="chip" data-pro="Andrea">Andrea</div>
+            <div class="chip" data-pro="Sofía">Sofía</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:9px;margin-left:auto">
+            <span style="font-size:13px;color:var(--gray);font-weight:600">Disponibilidad por servicio:</span>
+            <select id="svcFilter" class="btn-ghost" style="padding:9px 13px;border-radius:10px;border:1px solid var(--line);font-family:'DM Sans';font-size:13px">
+              <option value="">— Ver agenda normal —</option>
+              <option value="Cejas">Cejas (diseño)</option>
+              <option value="Uñas semipermanente">Uñas semipermanente</option>
+              <option value="Pestañas">Pestañas (lifting)</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="agendaGrid"></div>
+
+        <div class="legend">
+          <span><i style="background:var(--mauve)"></i>Uñas semi</span>
+          <span><i style="background:var(--rose)"></i>Cejas</span>
+          <span><i style="background:var(--plum)"></i>Pestañas</span>
+          <span><i style="background:var(--taupe)"></i>Corte</span>
+          <span><i style="background:var(--sand)"></i>Limpieza facial</span>
+        </div>
+      </section>
+
+      <!-- ===== ASISTENTE ===== -->
+      <section class="screen" data-screen="asistente">
+        <div class="note">El chat de comando. Dani le <b>escribe como le hablaría a una persona</b> y el sistema agenda, bloquea o registra. Sirve para las clientas que llegan en físico, sin tener que llenar formularios.</div>
+
+        <div class="sec-head"><div class="lead"><div class="eyebrow">Chat de comando</div><h2>Tu asistente</h2><div class="desc">Escribe en español normal. Yo lo agendo y bloqueo el espacio al instante.</div></div></div>
+
+        <div class="chat">
+          <div class="chat-box" id="chatBox">
+            <div class="msg bot">Hola Dani 👋 ¿A quién agendamos? Escríbeme la cita como quieras, por ejemplo:<br><b>"Uñas a las 4 con Daniela hoy para María"</b></div>
+          </div>
+          <div class="chat-input">
+            <input id="chatInput" placeholder="Escribe aquí… ej: cejas 11am con Sofía para Laura">
+            <button class="btn btn-primary" id="chatSend">Enviar</button>
+          </div>
+          <div class="quick">
+            <button data-q="Agéndame uñas semipermanente a las 4 con Daniela hoy para María">Uñas 4pm · Daniela</button>
+            <button data-q="Cejas a las 11 con Sofía para Laura Mejía">Cejas 11am · Sofía</button>
+            <button data-q="Agrega a la clienta Paula, 3105557788, se hizo pestañas">Registrar clienta nueva</button>
+            <button data-q="Registra una venta de uñas semipermanente con Andrea por $55.000">Registrar una venta</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== CLIENTAS ===== -->
+      <section class="screen" data-screen="clientas">
+        <div class="note">La base de datos. Se llena <b>sola</b> con cada cita por WhatsApp, y Dani puede <b>agregar a mano</b> a quien llegó en físico. Cada clienta guarda su servicio preferido, su cumpleaños y su historial. De aquí salen las ofertas y los retoques.</div>
+
+        <div class="sec-head">
+          <div class="lead"><div class="eyebrow">Base de datos</div><h2>Clientas</h2><div class="desc">128 clientas registradas · busca, filtra o agrega una nueva.</div></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-ghost" id="dlClients"><svg fill="none" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Descargar base</button>
+            <button class="btn btn-primary" id="addClient"><svg fill="none" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Agregar clienta</button>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
+          <input id="clientSearch" placeholder="Buscar por nombre o teléfono…" style="flex:1;min-width:220px;padding:11px 15px;border:1px solid var(--line);border-radius:10px;font-family:'DM Sans';font-size:14px;background:#fff">
+          <div class="chips" id="clientFilters">
+            <div class="chip active" data-f="all">Todas</div>
+            <div class="chip" data-f="cumple">Cumplen este mes</div>
+            <div class="chip" data-f="retoque">Retoque pendiente</div>
+            <div class="chip" data-f="vip">VIP</div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:8px 14px 14px">
+          <table>
+            <thead><tr><th>Clienta</th><th>Servicio frecuente</th><th>Última visita</th><th>Cumpleaños</th><th></th></tr></thead>
+            <tbody id="clientTable"></tbody>
+          </table>
+          <div class="empty" id="clientEmpty" style="display:none">No hay clientas con ese filtro.</div>
+        </div>
+      </section>
+
+      <!-- ===== AUTOMATIZACIONES ===== -->
+      <section class="screen" data-screen="auto">
+        <div class="note">Los mensajes que el sistema manda <b>solo</b>, sin que Dani mueva un dedo. Cada uno se prende o se apaga y el texto se puede editar. <b>Esto es lo que mantiene a las clientas volviendo.</b></div>
+
+        <div class="sec-head"><div class="lead"><div class="eyebrow">Mensajes automáticos</div><h2>Automatizaciones</h2><div class="desc">Configura qué se envía, cuándo y con qué texto.</div></div></div>
+
+        <div style="display:flex;flex-direction:column;gap:16px;max-width:760px">
+          <div class="card auto open">
+            <div class="ic" style="background:#FBE6D4"><svg fill="none" stroke="#b85716" stroke-width="1.7" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 01-3.4 0"/></svg></div>
+            <div class="body">
+              <h4>Recordatorios de cita <div class="switch on"></div></h4>
+              <p>Le recuerda a la clienta su cita varias veces antes, para que no se le olvide y no falte.</p>
+              <div class="cad"><span>2 días antes</span><span>1 día antes</span><span>2 horas</span><span>1 hora</span><span>30 min</span></div>
+            </div>
+          </div>
+
+          <div class="card auto">
+            <div class="ic" style="background:#F3E5E3"><svg fill="none" stroke="#9c6e68" stroke-width="1.7" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.7l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg></div>
+            <div class="body">
+              <h4>Después de la cita + cumpleaños <div class="switch on"></div></h4>
+              <p>Al terminar el servicio agradece y pide la fecha de cumpleaños para guardarla.</p>
+              <button class="link toggle-preview">Ver mensaje</button>
+              <div class="preview">"Nos encantó tenerte con nosotras 💛 Nos encantaría que nos dejaras tu fecha de cumpleaños, para consentirte en tu mes especial ✨"</div>
+            </div>
+          </div>
+
+          <div class="card auto">
+            <div class="ic" style="background:#F6EAE8"><svg fill="none" stroke="#8a5a52" stroke-width="1.7" viewBox="0 0 24 24"><path d="M20 12v9H4v-9M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg></div>
+            <div class="body">
+              <h4>Oferta de cumpleaños <div class="switch on"></div></h4>
+              <p>A las clientas que cumplen este mes les llega una oferta para que vuelvan a agendar.</p>
+              <button class="link toggle-preview">Ver mensaje</button>
+              <div class="preview">"¡Feliz mes, bella! 🎉 Queremos celebrarte: este mes tienes un regalo especial en tu próximo servicio. ¿Te lo agendamos? 💛"</div>
+            </div>
+          </div>
+
+          <div class="card auto">
+            <div class="ic" style="background:#FBE6D4"><svg fill="none" stroke="#b85716" stroke-width="1.7" viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-6.2-8.5M21 4v6h-6"/></svg></div>
+            <div class="body">
+              <h4>Recordatorio de retoque <div class="switch on"></div></h4>
+              <p>20 días después de unas uñas semipermanentes, invita a agendar el retoque con descuento.</p>
+              <div class="cad"><span>A los 20 días</span><span>10% si agenda ya</span></div>
+              <button class="link toggle-preview">Ver mensaje</button>
+              <div class="preview">"¡Hola bella! 💅 Ya es momento de tu retoque de uñas. ¿Te lo agendamos? Si reservas ahora, tienes un 10% de descuento ✨"</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== VENTAS ===== -->
+      <section class="screen" data-screen="ventas">
+        <div class="note">La caja del salón. Cada cita —por WhatsApp o manual— entra como venta <b>"Por confirmar"</b>. Al final del día Dani hace el <b>cierre</b>: marca quién vino, corrige o elimina. <b>Solo lo confirmado cuenta</b> para caja, reportes y comisiones.</div>
+
+        <div class="sec-head">
+          <div class="lead"><div class="eyebrow">Caja</div><h2>Ventas</h2><div class="desc">Todo lo cobrado, por día, semana o mes.</div></div>
+          <button class="btn btn-primary" id="addSale"><svg fill="none" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Registrar venta</button>
+        </div>
+
+        <div class="chips" id="venPeriod" style="margin-bottom:16px">
+          <div class="chip active" data-p="dia">Día</div>
+          <div class="chip" data-p="semana">Semana</div>
+          <div class="chip" data-p="mes">Mes</div>
+        </div>
+
+        <div class="grid g3" id="venCards" style="margin-bottom:18px"></div>
+
+        <div id="venCierre"></div>
+
+        <div class="card" style="padding:8px 14px 14px">
+          <table><thead><tr><th>Hora</th><th>Clienta</th><th>Servicio</th><th>Profesional</th><th>Pago</th><th style="text-align:right">Valor</th></tr></thead>
+          <tbody id="venTable"></tbody></table>
+        </div>
+      </section>
+
+      <!-- ===== COMISIONES ===== -->
+      <section class="screen" data-screen="comisiones">
+        <div class="note">Aquí Dani marca <b>quién hizo cada servicio</b> y el sistema calcula la comisión de cada profesional. Cambia entre día, semana y mes.</div>
+
+        <div class="sec-head">
+          <div class="lead"><div class="eyebrow">Liquidación</div><h2>Comisiones</h2><div class="desc">Comisión del 40% sobre el valor de cada servicio realizado.</div></div>
+          <div class="chips" id="comPeriod">
+            <div class="chip active" data-p="dia">Día</div>
+            <div class="chip" data-p="semana">Semana</div>
+            <div class="chip" data-p="mes">Mes</div>
+          </div>
+        </div>
+
+        <div class="grid g3" id="comCards"></div>
+
+        <div class="card pad" style="margin-top:18px">
+          <div class="sec-head"><div class="lead"><h2 style="font-size:16px">Detalle de servicios <span id="comPeriodLbl" class="muted" style="font-weight:400">— hoy</span></h2></div></div>
+          <table><thead><tr><th>Profesional</th><th>Servicio</th><th>Valor</th><th>Comisión (40%)</th></tr></thead>
+          <tbody id="comTable"></tbody></table>
+        </div>
+      </section>
+
+      <!-- ===== REPORTES ===== -->
+      <section class="screen" data-screen="reportes">
+        <div class="note">El tablero de plata. <b>Cuántas citas, cuántas por WhatsApp vs en físico, cuánto se vendió y cuánto se va en comisiones.</b> Por día, semana o mes.</div>
+
+        <div class="sec-head">
+          <div class="lead"><div class="eyebrow">Contabilidad</div><h2>Reportes</h2><div class="desc">El resumen del negocio en números claros.</div></div>
+          <div class="chips" id="repPeriod">
+            <div class="chip active" data-p="dia">Día</div>
+            <div class="chip" data-p="semana">Semana</div>
+            <div class="chip" data-p="mes">Mes</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;margin:0 0 18px;flex-wrap:wrap">
+          <button id="repPrint" class="btn btn-ghost btn-sm"><svg fill="none" stroke-width="1.8" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>Imprimir / PDF</button>
+          <button id="repDownload" class="btn btn-primary btn-sm"><svg fill="none" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Descargar reporte del mes</button>
+        </div>
+
+        <div class="grid g4" id="repCards" style="margin-bottom:20px"></div>
+
+        <div class="grid g2" style="align-items:start">
+          <div class="card pad">
+            <div class="eyebrow">Ventas</div>
+            <h2 style="font-size:16px;margin:6px 0 4px" id="repChartTitle">Ventas de la semana</h2>
+            <div class="bars" id="repBars"></div>
+          </div>
+          <div class="card pad">
+            <div class="eyebrow">Servicios por profesional</div>
+            <h2 style="font-size:16px;margin:6px 0 10px">Quién hizo qué</h2>
+            <table><thead><tr><th>Profesional</th><th>Servicios</th><th>Vendido</th></tr></thead>
+            <tbody id="repTable"></tbody></table>
+          </div>
+        </div>
+
+        <div class="grid g2" id="repDist" style="margin-top:20px;align-items:start"></div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<!-- ===== MODAL ===== -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal"></div>
+</div>
+
+<script>
+/* ---------- data ---------- */
+const SVC = {
+  "Uñas semipermanente":{c:"var(--mauve)",dur:90,price:55000,pros:["Daniela","Andrea"]},
+  "Uñas acrílicas":{c:"#B97F86",dur:120,price:80000,pros:["Andrea"]},
+  "Cejas":{c:"var(--rose)",dur:30,price:25000,pros:["Daniela","Sofía"]},
+  "Pestañas":{c:"var(--plum)",dur:60,price:70000,pros:["Sofía"]},
+  "Corte":{c:"var(--taupe)",dur:45,price:40000,pros:["Daniela"]},
+  "Limpieza facial":{c:"var(--sand)",dur:60,price:90000,pros:["Sofía"]}
+};
+const PROS=["Daniela","Andrea","Sofía"];
+const HOURS=["9:00","10:00","11:00","12:00","1:00","2:00","3:00","4:00","5:00"];
+// appointments: {h, pro, svc, client, src}
+let APPTS=[
+  {h:"9:00",pro:"Daniela",svc:"Cejas",client:"Valentina R.",src:"WhatsApp"},
+  {h:"10:00",pro:"Andrea",svc:"Uñas semipermanente",client:"Laura M.",src:"Físico"},
+  {h:"11:00",pro:"Sofía",svc:"Limpieza facial",client:"Camila T.",src:"WhatsApp"},
+  {h:"2:00",pro:"Andrea",svc:"Uñas acrílicas",client:"Sara G.",src:"WhatsApp"},
+  {h:"3:00",pro:"Sofía",svc:"Pestañas",client:"Marcela P.",src:"Físico"},
+  {h:"4:00",pro:"Daniela",svc:"Uñas semipermanente",client:"María P.",src:"WhatsApp"},
+];
+const fmt=n=>"$"+n.toLocaleString("es-CO");
+
+let CLIENTS=[
+  {n:"María Pérez",t:"310 555 1290",fav:"Uñas semipermanente",last:"22 jun 2026",bday:"14 de junio",vis:9,tags:["VIP","cumple","retoque"]},
+  {n:"Laura Mejía",t:"320 441 0098",fav:"Cejas",last:"18 jun 2026",bday:"3 de noviembre",vis:5,tags:[]},
+  {n:"Camila Torres",t:"301 778 2231",fav:"Limpieza facial",last:"22 jun 2026",bday:"27 de junio",vis:12,tags:["VIP","cumple"]},
+  {n:"Valentina Ríos",t:"315 220 6677",fav:"Cejas",last:"22 jun 2026",bday:"9 de marzo",vis:3,tags:[]},
+  {n:"Marcela Pinto",t:"312 909 3344",fav:"Pestañas",last:"02 jun 2026",bday:"21 de agosto",vis:7,tags:["retoque"]},
+  {n:"Sara González",t:"304 118 7755",fav:"Uñas acrílicas",last:"22 jun 2026",bday:"30 de enero",vis:4,tags:["retoque"]},
+  {n:"Daniela Gómez",t:"311 660 1212",fav:"Pestañas",last:"15 may 2026",bday:"5 de octubre",vis:2,tags:[]},
+  {n:"Andrea Salas",t:"318 332 9090",fav:"Uñas semipermanente",last:"10 jun 2026",bday:"19 de diciembre",vis:6,tags:["VIP"]},
+];
+
+/* ---------- nav ---------- */
+const titles={hoy:"Hoy",agenda:"Agenda",asistente:"Asistente",clientas:"Clientas",auto:"Automatizaciones",ventas:"Ventas",comisiones:"Comisiones",reportes:"Reportes"};
+function go(s){
+  document.querySelectorAll('.screen').forEach(x=>x.classList.toggle('active',x.dataset.screen===s));
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.toggle('active',x.dataset.go===s));
+  document.getElementById('pageTitle').textContent=titles[s]||s;
+  document.getElementById('sidebar').classList.remove('open');
+  window.scrollTo(0,0);
+  if(s==='agenda')renderAgenda();
+  if(s==='comisiones')renderCom('dia');
+  if(s==='ventas')renderVentas('dia');
+  if(s==='reportes')renderRep('dia');
+}
+document.querySelectorAll('[data-go]').forEach(el=>el.addEventListener('click',()=>go(el.dataset.go)));
+document.getElementById('hamb').onclick=()=>document.getElementById('sidebar').classList.toggle('open');
+document.getElementById('notesSwitch').onclick=function(){this.classList.toggle('on');document.body.classList.toggle('show-notes')};
+
+/* ---------- HOY list ---------- */
+(function(){
+  let h=APPTS.map(a=>{
+    const s=SVC[a.svc];
+    return `<div class="row"><div class="time">${a.h}</div><div class="swatch" style="background:${s.c}"></div>
+    <div class="main"><div class="t">${a.client}</div><div class="s">${a.svc} · ${a.pro}</div></div>
+    <span class="tag ${a.src==='WhatsApp'?'t-wa':'t-fis'}">${a.src}</span></div>`;
+  }).join("");
+  document.getElementById('hoyList').innerHTML=h;
+})();
+
+/* ---------- AGENDA ---------- */
+let curPro="all", curSvc="";
+function renderAgenda(){
+  const showPros = curPro==="all"?PROS:[curPro];
+  const colClass = showPros.length===1?"cols1":showPros.length===2?"cols2":"";
+  let head=`<div class="col-head"></div>`+showPros.map(p=>{
+    const svcs=Object.keys(SVC).filter(s=>SVC[s].pros.includes(p)).map(s=>s.split(" ")[0]).slice(0,3).join(", ");
+    return `<div class="col-head">${p}<span class="sv">${svcs}</span></div>`;
+  }).join("");
+  let body="";
+  HOURS.forEach(h=>{
+    body+=`<div class="hr">${h}</div>`;
+    showPros.forEach(p=>{
+      const a=APPTS.find(x=>x.h===h&&x.pro===p);
+      if(a){
+        const s=SVC[a.svc];
+        body+=`<div class="cell"><div class="appt" style="background:${s.c}" data-appt="${a.h}|${a.pro}">
+          <span class="who2">${a.client}</span><span>${a.svc.split(" ")[0]} · ${a.h}</span></div></div>`;
+      } else {
+        // service-availability mode
+        if(curSvc){
+          const offers=SVC[curSvc].pros.includes(p);
+          if(!offers){ body+=`<div class="cell"><div class="free" style="opacity:.35">—</div></div>`; }
+          else {
+            const busy=APPTS.find(x=>x.h===h&&x.pro===p);
+            if(busy){ body+=`<div class="cell"><div class="free blocked">ocupada</div></div>`; }
+            else { body+=`<div class="cell"><div class="free" style="background:#F3F8F4;color:#5E8C6A">libre ✓</div></div>`; }
+          }
+        } else {
+          body+=`<div class="cell"><div class="free">libre</div></div>`;
+        }
+      }
+    });
+  });
+  document.getElementById('agendaGrid').innerHTML=`<div class="agenda ${colClass}">${head}${body}</div>`;
+  document.querySelectorAll('[data-appt]').forEach(el=>el.onclick=()=>{
+    const[h,p]=el.dataset.appt.split("|");const a=APPTS.find(x=>x.h===h&&x.pro===p);openApptModal(a);
+  });
+}
+document.getElementById('proChips').addEventListener('click',e=>{
+  if(!e.target.dataset.pro)return;
+  document.querySelectorAll('#proChips .chip').forEach(c=>c.classList.remove('active'));
+  e.target.classList.add('active');curPro=e.target.dataset.pro;renderAgenda();
+});
+document.getElementById('svcFilter').addEventListener('change',e=>{curSvc=e.target.value;renderAgenda();});
+
+function openApptModal(a){
+  const s=SVC[a.svc];
+  const abono = a.src==='WhatsApp' ? '<span class="tag t-green">Abono aprobado ✓</span>' : '<span class="tag t-gray">Sin abono (físico)</span>';
+  showModal(`
+    <div class="modal-head"><div class="swatch" style="background:${s.c};height:30px"></div>
+      <div><h3 style="font-size:17px">${a.client}</h3><div class="muted" style="font-size:13px">${a.svc}</div></div>
+      <button class="x" onclick="closeModal()">&times;</button></div>
+    <div class="modal-body">
+      <div class="kv"><span class="k">Hora</span><span class="v">${a.h} ${parseInt(a.h)<8?'pm':'am'}</span></div>
+      <div class="kv"><span class="k">Profesional</span><span class="v">${a.pro}</span></div>
+      <div class="kv"><span class="k">Duración</span><span class="v">${s.dur} min</span></div>
+      <div class="kv"><span class="k">Valor</span><span class="v">${fmt(s.price)}</span></div>
+      <div class="kv"><span class="k">Origen</span><span class="v">${a.src}</span></div>
+      <div class="kv"><span class="k">Estado del abono</span><span class="v">${abono}</span></div>
+      <div style="display:flex;gap:10px;margin-top:18px">
+        <button class="btn btn-ghost btn-sm" onclick="closeModal()">Reprogramar</button>
+        <button class="btn btn-ghost btn-sm" onclick="closeModal()">Enviar mensaje</button>
+      </div>
+    </div>`);
+}
+
+/* ---------- ASISTENTE ---------- */
+const chatBox=document.getElementById('chatBox');
+function addMsg(t,cls){const d=document.createElement('div');d.className='msg '+cls;d.innerHTML=t;chatBox.appendChild(d);chatBox.scrollTop=chatBox.scrollHeight;}
+function addApptChip(svc,pro,h,client){
+  const s=SVC[svc]||{c:"var(--mauve)"};
+  const d=document.createElement('div');d.className='appt-chip';
+  d.innerHTML=`<div class="h"><span class="d" style="background:${s.c}"></span>Cita creada</div>
+    <div class="ln">${client} · ${svc}</div><div class="ln">${pro} · hoy ${h}</div>
+    <div class="ln" style="color:var(--green);font-weight:600;margin-top:4px">✓ Espacio bloqueado en la agenda</div>`;
+  chatBox.appendChild(d);chatBox.scrollTop=chatBox.scrollHeight;
+}
+function parseCmd(txt){
+  const low=txt.toLowerCase();
+  // register sale
+  if(/(venta|cobr|vend)/.test(low) && !/clienta/.test(low)){
+    const svc=Object.keys(SVC).find(s=>low.includes(s.split(" ")[0].toLowerCase()))||"Uñas semipermanente";
+    const pro=PROS.find(p=>low.includes(p.toLowerCase()))||SVC[svc].pros[0];
+    const m=low.match(/(\d[\d.]{3,})/);const val=m?parseInt(m[1].replace(/\./g,'')):SVC[svc].price;
+    VENTAS_DIA.unshift({t:"ahora",cl:"Mostrador",svc,pro,pay:"Efectivo",val,origen:"Asistente",status:"confirmada"});
+    setTimeout(()=>addMsg(`Anotado en caja 💰 Registré una venta de <b>${svc}</b> de <b>${pro}</b> por <b>${fmt(val)}</b>. Ya aparece en tu panel de Ventas.`,'bot'),550);
+    return;
+  }
+  // register client
+  if(/(agrega|registra|nueva clienta|añade)/.test(low)){
+    const phone=(txt.match(/\d{7,10}/)||[])[0];
+    const svc=Object.keys(SVC).find(s=>low.includes(s.split(" ")[0].toLowerCase()));
+    const nameM=txt.match(/clienta\s+([A-ZÁÉÍÓÚ][a-záéíóú]+)/);
+    const nm=nameM?nameM[1]:"la clienta";
+    setTimeout(()=>addMsg(`Listo ✅ Registré a <b>${nm}</b>${phone?` (${phone})`:""}${svc?` con servicio <b>${svc}</b>`:""} en tu base de datos.`,'bot'),500);
+    return;
+  }
+  const svc=Object.keys(SVC).find(s=>low.includes(s.split(" ")[0].toLowerCase()))||"Uñas semipermanente";
+  const pro=PROS.find(p=>low.includes(p.toLowerCase()))||SVC[svc].pros[0];
+  let hm=txt.match(/\b(\d{1,2})(?::(\d{2}))?\s*(am|pm|de la|a\.?m|p\.?m)?/i);
+  let h=hm?hm[1]+":"+(hm[2]||"00"):"4:00";
+  const nameM=txt.match(/para\s+([A-ZÁÉÍÓÚ][a-záéíóú]+(?:\s[A-ZÁÉÍÓÚ][a-záéíóú]+)?)/);
+  const client=nameM?nameM[1]:"la clienta";
+  setTimeout(()=>{
+    addMsg(`Perfecto 💛 Agendé <b>${svc}</b> con <b>${pro}</b> hoy a las <b>${h}</b>${client!=="la clienta"?` para <b>${client}</b>`:""}.`,'bot');
+    setTimeout(()=>addApptChip(svc,pro,h,client),350);
+  },550);
+}
+function sendChat(){
+  const v=document.getElementById('chatInput').value.trim();if(!v)return;
+  addMsg(v,'user');document.getElementById('chatInput').value="";parseCmd(v);
+}
+document.getElementById('chatSend').onclick=sendChat;
+document.getElementById('chatInput').addEventListener('keydown',e=>{if(e.key==='Enter')sendChat();});
+document.querySelectorAll('.quick button').forEach(b=>b.onclick=()=>{document.getElementById('chatInput').value=b.dataset.q;sendChat();});
+
+/* ---------- CLIENTAS ---------- */
+function clientAvatar(n){const i=n[0];const col=["var(--mauve)","var(--orange)","var(--plum)","var(--rose)"][n.length%4];return `<span class="av-sm" style="background:${col}">${i}</span>`;}
+function tagPills(tags){
+  let m={vip:'<span class="tag t-orange">VIP</span>',cumple:'<span class="tag t-mauve">Cumple este mes</span>',retoque:'<span class="tag t-green">Retoque</span>'};
+  return tags.map(t=>m[t]||"").join(" ");
+}
+let cFilter="all",cSearch="";
+function renderClients(){
+  let list=CLIENTS.filter(c=>{
+    if(cFilter!=="all"&&!c.tags.includes(cFilter))return false;
+    if(cSearch&&!(c.n.toLowerCase().includes(cSearch)||c.t.includes(cSearch)))return false;
+    return true;
+  });
+  const tb=document.getElementById('clientTable');
+  document.getElementById('clientEmpty').style.display=list.length?"none":"block";
+  tb.innerHTML=list.map((c,i)=>`<tr data-ci="${CLIENTS.indexOf(c)}">
+    <td class="cname">${clientAvatar(c.n)}${c.n}<div style="margin-top:5px">${tagPills(c.tags)}</div></td>
+    <td class="muted">${c.fav}</td><td class="muted">${c.last}</td><td class="muted">${c.bday}</td>
+    <td style="text-align:right"><span class="muted">${c.t}</span></td></tr>`).join("");
+  tb.querySelectorAll('tr').forEach(r=>r.onclick=()=>openClient(CLIENTS[r.dataset.ci]));
+}
+document.getElementById('clientSearch').addEventListener('input',e=>{cSearch=e.target.value.toLowerCase();renderClients();});
+document.getElementById('clientFilters').addEventListener('click',e=>{
+  if(!e.target.dataset.f)return;
+  document.querySelectorAll('#clientFilters .chip').forEach(c=>c.classList.remove('active'));
+  e.target.classList.add('active');cFilter=e.target.dataset.f;renderClients();
+});
+function openClient(c){
+  showModal(`
+    <div class="modal-head">${clientAvatar(c.n)}
+      <div><h3 style="font-size:18px">${c.n}</h3><div class="muted" style="font-size:13px">${c.t}</div></div>
+      <button class="x" onclick="closeModal()">&times;</button></div>
+    <div class="modal-body">
+      <div style="margin-bottom:14px">${tagPills(c.tags)}</div>
+      <div class="kv"><span class="k">Servicio preferido</span><span class="v">${c.fav}</span></div>
+      <div class="kv"><span class="k">Visitas totales</span><span class="v">${c.vis}</span></div>
+      <div class="kv"><span class="k">Última visita</span><span class="v">${c.last}</span></div>
+      <div class="kv"><span class="k">Cumpleaños</span><span class="v">${c.bday}</span></div>
+      <div style="display:flex;gap:10px;margin-top:18px">
+        <button class="btn btn-primary btn-sm" onclick="closeModal()">Agendar cita</button>
+        <button class="btn btn-ghost btn-sm" onclick="closeModal()">Enviar WhatsApp</button>
+      </div>
+    </div>`);
+}
+document.getElementById('addClient').onclick=()=>{
+  showModal(`
+    <div class="modal-head"><h3 style="font-size:17px">Agregar clienta</h3><button class="x" onclick="closeModal()">&times;</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Nombre</label><input id="ncN" placeholder="Nombre y apellido"></div>
+      <div class="field"><label>Teléfono</label><input id="ncT" placeholder="300 000 0000"></div>
+      <div class="field"><label>Servicio que se hizo</label><select id="ncS">${Object.keys(SVC).map(s=>`<option>${s}</option>`).join("")}</select></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="saveClient()">Guardar clienta</button>
+    </div>`);
+};
+function saveClient(){
+  const n=document.getElementById('ncN').value||"Clienta nueva";
+  const t=document.getElementById('ncT').value||"—";
+  const s=document.getElementById('ncS').value;
+  CLIENTS.unshift({n,t,fav:s,last:"hoy",bday:"—",vis:1,tags:[]});
+  closeModal();renderClients();
+}
+renderClients();
+
+/* ---------- VENTAS ---------- */
+// status: 'pendiente' (cita por verificar) | 'confirmada' (vino) | 'novino'
+// origen: WhatsApp / Físico / Manual / Asistente
+let VENTAS_DIA=[
+  {t:"9:00 am",cl:"Valentina R.",svc:"Cejas",pro:"Daniela",pay:"Efectivo",val:25000,origen:"WhatsApp",status:"confirmada"},
+  {t:"10:00 am",cl:"Laura M.",svc:"Uñas semipermanente",pro:"Andrea",pay:"Transferencia",val:55000,origen:"Físico",status:"confirmada"},
+  {t:"11:00 am",cl:"Camila T.",svc:"Limpieza facial",pro:"Sofía",pay:"Tarjeta",val:90000,origen:"WhatsApp",status:"confirmada"},
+  {t:"2:00 pm",cl:"Sara G.",svc:"Uñas acrílicas",pro:"Andrea",pay:"Efectivo",val:80000,origen:"WhatsApp",status:"confirmada"},
+  {t:"3:00 pm",cl:"Marcela P.",svc:"Pestañas",pro:"Sofía",pay:"Transferencia",val:70000,origen:"Físico",status:"pendiente"},
+  {t:"4:00 pm",cl:"María P.",svc:"Uñas semipermanente",pro:"Daniela",pay:"Transferencia",val:55000,origen:"WhatsApp",status:"pendiente"},
+];
+const VTOTAL={semana:1980000,mes:8120000},VCOUNT={semana:34,mes:142};
+const VSAMPLE={
+  semana:[
+    {t:"Vie 5:00 pm",cl:"María P.",svc:"Uñas semipermanente",pro:"Daniela",pay:"Transferencia",val:55000},
+    {t:"Vie 3:00 pm",cl:"Natalia C.",svc:"Pestañas",pro:"Sofía",pay:"Efectivo",val:70000},
+    {t:"Jue 11:00 am",cl:"Paula R.",svc:"Limpieza facial",pro:"Sofía",pay:"Tarjeta",val:90000},
+    {t:"Jue 9:00 am",cl:"Luisa M.",svc:"Cejas",pro:"Daniela",pay:"Efectivo",val:25000},
+    {t:"Mié 4:00 pm",cl:"Karen T.",svc:"Uñas acrílicas",pro:"Andrea",pay:"Transferencia",val:80000},
+    {t:"Mié 1:00 pm",cl:"Sara G.",svc:"Uñas semipermanente",pro:"Andrea",pay:"Efectivo",val:55000},
+  ],
+  mes:[
+    {t:"22 jun",cl:"María P.",svc:"Uñas semipermanente",pro:"Daniela",pay:"Transferencia",val:55000},
+    {t:"21 jun",cl:"Camila T.",svc:"Limpieza facial",pro:"Sofía",pay:"Tarjeta",val:90000},
+    {t:"19 jun",cl:"Andrea S.",svc:"Uñas acrílicas",pro:"Andrea",pay:"Efectivo",val:80000},
+    {t:"18 jun",cl:"Laura M.",svc:"Cejas",pro:"Daniela",pay:"Efectivo",val:25000},
+    {t:"15 jun",cl:"Daniela G.",svc:"Pestañas",pro:"Sofía",pay:"Transferencia",val:70000},
+    {t:"12 jun",cl:"Karen T.",svc:"Uñas semipermanente",pro:"Andrea",pay:"Transferencia",val:55000},
+  ]
+};
+const payTag={Efectivo:"t-green",Transferencia:"t-wa",Tarjeta:"t-mauve"};
+const origenTag={WhatsApp:"t-wa","Físico":"t-fis",Manual:"t-fis",Asistente:"t-orange"};
+
+function renderVentas(p){
+  document.querySelectorAll('#venPeriod .chip').forEach(c=>c.classList.toggle('active',c.dataset.p===p));
+  const cierre=document.getElementById('venCierre');
+  let total,count,rows,prom;
+
+  if(p==='dia'){
+    const conf=VENTAS_DIA.filter(v=>v.status==='confirmada');
+    const pend=VENTAS_DIA.map((v,i)=>({v,i})).filter(o=>o.v.status==='pendiente');
+    const noShows=VENTAS_DIA.filter(v=>v.status==='novino').length;
+    total=conf.reduce((s,v)=>s+v.val,0);count=conf.length;
+    prom=count?Math.round(total/count):0;
+    const pendTot=pend.reduce((s,o)=>s+o.v.val,0);
+
+    document.getElementById('venCards').innerHTML=`
+      <div class="card pad stat"><div class="lbl"><span class="dot" style="background:var(--green)"></span>Confirmado hoy</div><div class="num">${fmt(total)}</div><div class="sub">${count} ventas verificadas</div></div>
+      <div class="card pad stat"><div class="lbl"><span class="dot" style="background:var(--orange)"></span>Por verificar</div><div class="num">${pend.length}</div><div class="sub">${fmt(pendTot)} en espera${noShows?` · ${noShows} no vino`:""}</div></div>
+      <div class="card pad stat"><div class="lbl"><span class="dot" style="background:var(--mauve)"></span>Ticket promedio</div><div class="num">${fmt(prom)}</div><div class="sub">Por venta confirmada</div></div>`;
+
+    // ----- Cierre del día panel -----
+    if(pend.length){
+      const items=pend.map(o=>{
+        const v=o.v,c=SVC[v.svc]?SVC[v.svc].c:"var(--mauve)";
+        return `<div class="row" style="gap:11px;flex-wrap:wrap">
+          <div class="swatch" style="background:${c}"></div>
+          <div class="main"><div class="t">${v.cl}</div><div class="s">${v.svc} · ${v.pro} · ${v.t}</div></div>
+          <span class="tag ${origenTag[v.origen]||'t-gray'}">${v.origen}</span>
+          <span style="font-weight:700;min-width:74px;text-align:right">${fmt(v.val)}</span>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn btn-sm" style="background:var(--green);color:#fff" onclick="confirmSale(${o.i})">✓ Vino</button>
+            <button class="btn btn-ghost btn-sm" onclick="noShow(${o.i})">No vino</button>
+            <button class="btn btn-ghost btn-sm" onclick="editSale(${o.i})">Corregir</button>
+            <button class="btn btn-ghost btn-sm" onclick="delSale(${o.i})" title="Eliminar" style="color:#b5524a">✕</button>
+          </div></div>`;
+      }).join("");
+      cierre.innerHTML=`<div class="card" style="border:1.5px solid var(--orange);margin-bottom:18px">
+        <div style="padding:16px 20px 6px;display:flex;align-items:center;gap:12px">
+          <div style="width:34px;height:34px;border-radius:9px;background:#FBE6D4;display:grid;place-items:center;flex-shrink:0">
+            <svg width="17" height="17" fill="none" stroke="#b85716" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+          <div><h3 style="font-size:15.5px">Cierre del día · ${pend.length} por verificar</h3>
+          <div class="muted" style="font-size:12.5px">Confirma quién vino antes de cerrar la caja. Solo lo confirmado cuenta como venta.</div></div>
+        </div>
+        <div style="padding:2px 20px 14px">${items}</div></div>`;
+    } else {
+      cierre.innerHTML=`<div class="card pad" style="margin-bottom:18px;display:flex;align-items:center;gap:12px;background:#F3F8F4;border-color:#cfe3d6">
+        <svg width="20" height="20" fill="none" stroke="#5E8C6A" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        <div style="font-size:13.5px;color:#3f6b4c;font-weight:600">Día cerrado · todas las citas verificadas. La caja ya es real.</div></div>`;
+    }
+    rows=VENTAS_DIA.filter(v=>v.status==='confirmada');
+  } else {
+    cierre.innerHTML="";
+    rows=VSAMPLE[p];total=VTOTAL[p];count=VCOUNT[p];prom=Math.round(total/count);
+    document.getElementById('venCards').innerHTML=`
+      <div class="card pad stat"><div class="lbl">Total vendido</div><div class="num">${fmt(total)}</div><div class="sub">${p==='semana'?'Esta semana':'Este mes'}</div></div>
+      <div class="card pad stat"><div class="lbl">Ventas</div><div class="num">${count}</div><div class="sub">Servicios confirmados</div></div>
+      <div class="card pad stat"><div class="lbl"><span class="dot" style="background:var(--mauve)"></span>Ticket promedio</div><div class="num">${fmt(prom)}</div><div class="sub">Por venta</div></div>`;
+  }
+
+  let body=rows.map(v=>{
+    const c=SVC[v.svc]?SVC[v.svc].c:"var(--mauve)";
+    return `<tr style="cursor:default"><td class="muted">${v.t}</td><td class="cname">${v.cl}</td>
+    <td><span class="swatch" style="display:inline-block;width:4px;height:14px;vertical-align:middle;margin-right:8px;background:${c}"></span>${v.svc}</td>
+    <td class="muted">${v.pro}</td><td><span class="tag ${payTag[v.pay]||'t-gray'}">${v.pay}</span></td>
+    <td style="text-align:right;font-weight:700">${fmt(v.val)}</td></tr>`;
+  }).join("");
+  if(!rows.length)body=`<tr style="cursor:default"><td colspan="6" class="muted" style="text-align:center;padding:18px">Aún no hay ventas confirmadas. Verifica las citas en el cierre del día.</td></tr>`;
+  else if(p!=='dia')body+=`<tr style="cursor:default"><td colspan="6" class="muted" style="text-align:center;padding:14px">Mostrando las ventas más recientes</td></tr>`;
+  document.getElementById('venTable').innerHTML=body;
+}
+
+/* verification actions */
+function confirmSale(i){VENTAS_DIA[i].status='confirmada';renderVentas('dia');}
+function noShow(i){VENTAS_DIA[i].status='novino';renderVentas('dia');}
+function delSale(i){VENTAS_DIA.splice(i,1);renderVentas('dia');}
+function editSale(i){
+  const v=VENTAS_DIA[i];
+  showModal(`
+    <div class="modal-head"><h3 style="font-size:17px">Corregir venta</h3><button class="x" onclick="closeModal()">&times;</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Clienta</label><input id="esC" value="${v.cl}"></div>
+      <div class="field"><label>Servicio</label><select id="esS" onchange="document.getElementById('esV').value=SVC[this.value].price">${Object.keys(SVC).map(s=>`<option value="${s}" ${s===v.svc?'selected':''}>${s}</option>`).join("")}</select></div>
+      <div class="field"><label>Profesional</label><select id="esP">${PROS.map(p=>`<option ${p===v.pro?'selected':''}>${p}</option>`).join("")}</select></div>
+      <div class="field"><label>Método de pago</label><select id="esM">${["Efectivo","Transferencia","Tarjeta"].map(m=>`<option ${m===v.pay?'selected':''}>${m}</option>`).join("")}</select></div>
+      <div class="field"><label>Valor</label><input id="esV" type="number" value="${v.val}"></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="saveEdit(${i})">Guardar y confirmar venta</button>
+    </div>`);
+}
+function saveEdit(i){
+  const v=VENTAS_DIA[i];
+  v.cl=document.getElementById('esC').value||v.cl;
+  v.svc=document.getElementById('esS').value;v.pro=document.getElementById('esP').value;
+  v.pay=document.getElementById('esM').value;v.val=parseInt(document.getElementById('esV').value)||v.val;
+  v.status='confirmada';closeModal();renderVentas('dia');
+}
+
+document.getElementById('venPeriod').addEventListener('click',e=>{if(e.target.dataset.p)renderVentas(e.target.dataset.p);});
+document.getElementById('addSale').onclick=()=>{
+  showModal(`
+    <div class="modal-head"><h3 style="font-size:17px">Registrar venta manual</h3><button class="x" onclick="closeModal()">&times;</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Servicio</label><select id="vsS" onchange="document.getElementById('vsV').value=SVC[this.value].price">${Object.keys(SVC).map(s=>`<option value="${s}">${s}</option>`).join("")}</select></div>
+      <div class="field"><label>Profesional</label><select id="vsP">${PROS.map(p=>`<option>${p}</option>`).join("")}</select></div>
+      <div class="field"><label>Clienta (opcional)</label><input id="vsC" placeholder="Nombre de la clienta"></div>
+      <div class="field"><label>Método de pago</label><select id="vsM"><option>Efectivo</option><option>Transferencia</option><option>Tarjeta</option></select></div>
+      <div class="field"><label>Valor</label><input id="vsV" type="number" value="55000"></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="saveSale()">Guardar venta</button>
+    </div>`);
+  document.getElementById('vsV').value=SVC[document.getElementById('vsS').value].price;
+};
+function saveSale(){
+  const svc=document.getElementById('vsS').value,pro=document.getElementById('vsP').value;
+  const cl=document.getElementById('vsC').value||"Mostrador",pay=document.getElementById('vsM').value;
+  const val=parseInt(document.getElementById('vsV').value)||SVC[svc].price;
+  VENTAS_DIA.unshift({t:"ahora",cl,svc,pro,pay,val,origen:"Manual",status:"confirmada"});
+  closeModal();renderVentas('dia');
+}
+
+/* ---------- COMISIONES ---------- */
+const COM={
+  dia:[
+    {pro:"Daniela",svc:"Cejas",val:25000},{pro:"Daniela",svc:"Uñas semipermanente",val:55000},
+    {pro:"Andrea",svc:"Uñas semipermanente",val:55000},{pro:"Andrea",svc:"Uñas acrílicas",val:80000},
+    {pro:"Sofía",svc:"Limpieza facial",val:90000},{pro:"Sofía",svc:"Pestañas",val:70000},
+  ],
+  semana:[{pro:"Daniela",svc:"varios (8)",val:340000},{pro:"Andrea",svc:"varios (11)",val:610000},{pro:"Sofía",svc:"varios (7)",val:480000}],
+  mes:[{pro:"Daniela",svc:"varios (34)",val:1420000},{pro:"Andrea",svc:"varios (41)",val:2380000},{pro:"Sofía",svc:"varios (29)",val:1910000}]
+};
+const COMLBL={dia:"— hoy",semana:"— esta semana",mes:"— este mes"};
+function renderCom(p){
+  document.querySelectorAll('#comPeriod .chip').forEach(c=>c.classList.toggle('active',c.dataset.p===p));
+  document.getElementById('comPeriodLbl').textContent=COMLBL[p];
+  const rows=COM[p];
+  let tot={};rows.forEach(r=>tot[r.pro]=(tot[r.pro]||0)+r.val);
+  document.getElementById('comCards').innerHTML=PROS.map(pr=>{
+    const v=tot[pr]||0,com=Math.round(v*.4);
+    const cnt=rows.filter(r=>r.pro===pr).length;
+    return `<div class="card pad stat"><div class="lbl"><span class="dot" style="background:var(--mauve)"></span>${pr}</div>
+      <div class="num">${fmt(com)}</div><div class="sub">${p==='dia'?cnt+' servicios':rows.find(r=>r.pro===pr)?.svc} · vendió ${fmt(v)}</div></div>`;
+  }).join("");
+  document.getElementById('comTable').innerHTML=rows.map(r=>`<tr style="cursor:default"><td class="cname">${r.pro}</td>
+    <td class="muted">${r.svc}</td><td>${fmt(r.val)}</td><td style="color:var(--green);font-weight:700">${fmt(Math.round(r.val*.4))}</td></tr>`).join("");
+}
+document.getElementById('comPeriod').addEventListener('click',e=>{if(e.target.dataset.p)renderCom(e.target.dataset.p);});
+
+/* ---------- REPORTES ---------- */
+const REP={
+  dia:{citas:6,wa:4,fis:2,ventas:375000,com:150000,bars:[["9-10h",80],["11h",90],["14h",80],["16h",55],["17h",70]],chart:"Ventas de hoy",
+       table:[["Daniela",2,80000],["Andrea",2,135000],["Sofía",2,160000]],
+       dist:[["Uñas semipermanente",2],["Cejas",1],["Uñas acrílicas",1],["Pestañas",1],["Limpieza facial",1]]},
+  semana:{citas:34,wa:23,fis:11,ventas:1980000,com:792000,bars:[["Lun",355],["Mar",290],["Mié",410],["Jue",320],["Vie",605]],chart:"Ventas de la semana",
+       table:[["Daniela",8,340000],["Andrea",11,610000],["Sofía",7,480000]],
+       dist:[["Uñas semipermanente",12],["Cejas",7],["Uñas acrílicas",5],["Pestañas",4],["Limpieza facial",4],["Corte",2]]},
+  mes:{citas:142,wa:98,fis:44,ventas:8120000,com:3248000,bars:[["Sem 1",1820],["Sem 2",1980],["Sem 3",2140],["Sem 4",2180]],chart:"Ventas del mes",
+       table:[["Daniela",34,1420000],["Andrea",41,2380000],["Sofía",29,1910000]],
+       dist:[["Uñas semipermanente",48],["Cejas",28],["Uñas acrílicas",23],["Pestañas",17],["Limpieza facial",16],["Corte",10]]}
+};
+const HEX={"Uñas semipermanente":"#C9968F","Uñas acrílicas":"#B97F86","Cejas":"#D9A7AC","Pestañas":"#A87C8C","Corte":"#B7A48C","Limpieza facial":"#CBB89A"};
+function donutSVG(segs){
+  const tot=segs.reduce((s,x)=>s+x.n,0)||1,R=52,C=2*Math.PI*R;let off=0;
+  const arcs=segs.map(s=>{const len=C*s.n/tot;
+    const a=`<circle cx="70" cy="70" r="${R}" fill="none" stroke="${s.color}" stroke-width="17" stroke-dasharray="${len.toFixed(2)} ${(C-len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 70 70)"/>`;
+    off+=len;return a;}).join("");
+  return {arcs,tot};
+}
+function donutBlock(title,segs,centerBig,centerSmall){
+  const {arcs,tot}=donutSVG(segs);
+  const leg=segs.map(s=>`<div style="display:flex;align-items:center;gap:8px;font-size:12.5px;margin:6px 0">
+    <i style="width:11px;height:11px;border-radius:3px;background:${s.color};flex-shrink:0"></i>
+    <span style="flex:1">${s.label}</span><b style="font-family:Outfit">${Math.round(s.n/tot*100)}%</b></div>`).join("");
+  return `<div class="card pad"><div class="eyebrow">${title}</div>
+    <div style="display:flex;gap:20px;align-items:center;margin-top:12px;flex-wrap:wrap">
+      <svg viewBox="0 0 140 140" width="138" height="138" style="flex-shrink:0">${arcs}
+        <text x="70" y="66" text-anchor="middle" font-family="Outfit" font-weight="700" font-size="22" fill="#0A0A08">${centerBig}</text>
+        <text x="70" y="84" text-anchor="middle" font-family="DM Sans" font-size="9" fill="#706C61">${centerSmall}</text></svg>
+      <div style="flex:1;min-width:160px">${leg}</div></div></div>`;
+}
+function renderRep(p){
+  document.querySelectorAll('#repPeriod .chip').forEach(c=>c.classList.toggle('active',c.dataset.p===p));
+  const d=REP[p];
+  document.getElementById('repCards').innerHTML=`
+    <div class="card pad stat"><div class="lbl">Citas</div><div class="num">${d.citas}</div>
+      <div class="split"><span class="pill-wa">${d.wa} WhatsApp</span><span class="pill-fis">${d.fis} físico</span></div></div>
+    <div class="card pad stat"><div class="lbl">Ventas</div><div class="num">${fmt(d.ventas)}</div><div class="sub">Total facturado</div></div>
+    <div class="card pad stat"><div class="lbl"><span class="dot" style="background:var(--mauve)"></span>Comisiones</div><div class="num">${fmt(d.com)}</div><div class="sub">A pagar a profesionales</div></div>
+    <div class="card pad stat"><div class="lbl"><span class="dot" style="background:var(--green)"></span>Queda para el negocio</div><div class="num">${fmt(d.ventas-d.com)}</div><div class="sub">Ventas — comisiones</div></div>`;
+  document.getElementById('repChartTitle').textContent=d.chart;
+  const max=Math.max(...d.bars.map(b=>b[1]));
+  document.getElementById('repBars').innerHTML=d.bars.map(b=>`<div class="bar-wrap">
+    <div class="bar-val">${(b[1]>=1000?(b[1]/1000).toFixed(1)+'M':'$'+b[1]+'K')}</div>
+    <div class="bar" style="height:${Math.round(b[1]/max*130)}px"></div><div class="bar-lbl">${b[0]}</div></div>`).join("");
+  document.getElementById('repTable').innerHTML=d.table.map(r=>`<tr style="cursor:default"><td class="cname">${r[0]}</td>
+    <td class="muted">${r[1]} servicios</td><td>${fmt(r[2])}</td></tr>`).join("");
+  // distribution donuts
+  const svcSegs=d.dist.map(x=>({label:x[0],n:x[1],color:HEX[x[0]]||"#C9968F"}));
+  const canalSegs=[{label:"Por WhatsApp",n:d.wa,color:"#5E8C6A"},{label:"En físico",n:d.fis,color:"#B7A48C"}];
+  document.getElementById('repDist').innerHTML=
+    donutBlock("Servicios agendados por porcentaje",svcSegs,d.citas,"servicios")+
+    donutBlock("Agendamiento por canal",canalSegs,Math.round(d.wa/d.citas*100)+"%","por WhatsApp");
+}
+document.getElementById('repPeriod').addEventListener('click',e=>{if(e.target.dataset.p)renderRep(e.target.dataset.p);});
+
+/* ---------- descargas ---------- */
+function downloadCSV(name,rows){
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\r\n");
+  const blob=new Blob(["﻿"+csv],{type:"text/csv;charset=utf-8;"});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+const PERLBL={dia:"hoy",semana:"esta_semana",mes:"junio_2026"};
+function curPeriod(){return document.querySelector('#repPeriod .chip.active').dataset.p;}
+document.getElementById('repDownload').onclick=()=>{
+  const p=curPeriod(),d=REP[p];
+  const rows=[["Reporte Estudio Ámbar — "+(p==='mes'?'Junio 2026':p==='semana'?'Esta semana':'Hoy')],[],
+    ["Resumen"],
+    ["Total de citas",d.citas],["Agendadas por WhatsApp",d.wa],["Agendadas en físico",d.fis],
+    ["Total de ventas",d.ventas],["Total de comisiones",d.com],["Queda para el negocio",d.ventas-d.com],[],
+    ["Servicios agendados por porcentaje"],["Servicio","Cantidad","Porcentaje"],
+    ...d.dist.map(x=>[x[0],x[1],Math.round(x[1]/d.citas*100)+"%"]),[],
+    ["Servicios por profesional"],["Profesional","Servicios","Vendido"],
+    ...d.table.map(r=>[r[0],r[1],r[2]])];
+  downloadCSV(`reporte_estudioambar_${PERLBL[p]}.csv`,rows);
+};
+document.getElementById('repPrint').onclick=()=>window.print();
+document.getElementById('dlClients').onclick=()=>{
+  const rows=[["Base de datos de clientas — Estudio Ámbar"],[],
+    ["Nombre","Teléfono","Servicio frecuente","Última visita","Cumpleaños","Visitas","Etiquetas"],
+    ...CLIENTS.map(c=>[c.n,c.t,c.fav,c.last,c.bday,c.vis,c.tags.join(" / ")])];
+  downloadCSV("base_de_datos_clientas_estudioambar.csv",rows);
+};
+
+/* ---------- automations preview ---------- */
+document.querySelectorAll('.toggle-preview').forEach(b=>b.onclick=function(){this.closest('.auto').classList.toggle('open');this.textContent=this.closest('.auto').classList.contains('open')?'Ocultar mensaje':'Ver mensaje';});
+document.querySelectorAll('.auto .switch').forEach(s=>s.onclick=e=>{e.stopPropagation();s.classList.toggle('on');});
+
+/* ---------- modal ---------- */
+function showModal(html){document.getElementById('modal').innerHTML=html;document.getElementById('overlay').classList.add('show');}
+function closeModal(){document.getElementById('overlay').classList.remove('show');}
+document.getElementById('overlay').onclick=e=>{if(e.target.id==='overlay')closeModal();};
+
+/* init */
+renderAgenda();
+</script>
+
+<div class="demo-flag"><b>Demostración</b> · Datos de ejemplo. Sistema de gestión para salones de belleza construido por FluyLab.</div>
+<a href="../../../index.html" class="fluy-back" aria-label="Volver al sitio de FluyLab">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+  <img src="../../../assets/fluylab-logo-claro.png" alt="FluyLab">
+  <span>Volver</span>
+</a>
+</body>
+</html>
