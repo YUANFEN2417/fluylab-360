@@ -132,8 +132,9 @@ tbody tr:hover{background:var(--card2)}
 .art:disabled{opacity:.4;cursor:not-allowed;transform:none}
 .art .cod{font-family:'Outfit';font-weight:700;font-size:11px;color:var(--gris);min-width:62px;flex:none}
 .art .inf{flex:1;min-width:0}
-.art .nm{font-family:'Outfit';font-weight:600;font-size:13.5px;margin-bottom:3px}
-.art .dt{font-size:11.5px;color:var(--gris)}
+.art .inf{display:block}
+.art .nm{display:block;font-family:'Outfit';font-weight:600;font-size:13.5px;margin-bottom:3px;color:var(--crema)}
+.art .dt{display:block;font-size:11.5px;color:var(--gris);line-height:1.4}
 .art .st{font-size:11.5px;min-width:74px;text-align:right;flex:none}
 .art .pr{font-family:'Outfit';font-weight:700;font-size:14px;color:var(--naranja);
   min-width:86px;text-align:right;flex:none}
@@ -150,7 +151,20 @@ tbody tr:hover{background:var(--card2)}
 .cli-sel select option{background:var(--card2);color:var(--crema)}
 .cli-tag{font-size:10px;font-family:'Outfit';font-weight:700;padding:3px 8px;border-radius:99px;
   background:var(--naranja-soft);color:var(--naranja);white-space:nowrap}
-.vb-items{flex:1;overflow-y:auto;padding:6px 0;min-height:70px}
+.vb-items{flex:1;overflow-y:auto;padding:6px 0;min-height:70px;display:flex;flex-direction:column}
+.vb-empty{flex:1;display:flex;flex-direction:column;padding:22px 17px}
+.vb-empty .msg{text-align:center;color:var(--gris);font-size:12.8px;line-height:1.6;padding:18px 0 24px}
+.vb-empty .msg .ic{width:44px;height:44px;border-radius:12px;background:var(--card2);
+  border:1px solid var(--linea);display:flex;align-items:center;justify-content:center;
+  margin:0 auto 13px;color:var(--gris)}
+.vb-empty .t{font-size:9.5px;letter-spacing:2px;text-transform:uppercase;color:var(--gris);
+  margin-bottom:10px;padding-top:16px;border-top:1px solid var(--linea2)}
+.ult{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:12.3px;
+  border-bottom:1px solid var(--linea2)}
+.ult:last-child{border-bottom:none}
+.ult .n{font-family:'Outfit';font-weight:600;font-size:11px;color:var(--gris);min-width:58px}
+.ult .c{flex:1;color:var(--gris2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ult .v{font-family:'Outfit';font-weight:600;font-size:12px}
 .vi{display:flex;align-items:center;gap:10px;padding:9px 17px}
 .vi:hover{background:var(--card2)}
 .vi .nm{flex:1;font-size:12.8px;line-height:1.35}
@@ -305,9 +319,7 @@ tbody tr:hover{background:var(--card2)}
                 <span class="cli-tag" id="cliTag">Público</span>
               </div>
             </div>
-            <div class="vb-items" id="vbItems">
-              <div class="vacio">Toca un artículo<br>para agregarlo a la venta.</div>
-            </div>
+            <div class="vb-items" id="vbItems"></div>
             <div class="vb-f">
               <div class="lin"><span>Subtotal</span><b id="vSub">$0</b></div>
               <div class="lin desc" id="linDesc" style="display:none"><span id="descLbl">Descuento</span><b id="vDesc">-$0</b></div>
@@ -517,7 +529,7 @@ tbody tr:hover{background:var(--card2)}
   }
   function pintarVenta(){
     if(!venta.length){
-      $('#vbItems').innerHTML='<div class="vacio">Toca un artículo<br>para agregarlo a la venta.</div>';
+      $('#vbItems').innerHTML=vacioHTML();
       ['vSub','vIva','vTot'].forEach(function(id){$('#'+id).textContent='$0'});
       $('#linDesc').style.display='none';
       $('#btnFact').disabled=true; return;
@@ -553,6 +565,26 @@ tbody tr:hover{background:var(--card2)}
     $('#btnFact').disabled=false;
   }
 
+  var ULTIMAS=[
+    {n:'FE-4127', c:'Constructora Sierra S.A.S.', v:2840000},
+    {n:'FE-4126', c:'Público general',            v:186000},
+    {n:'FE-4125', c:'Instalaciones Vélez',        v:1240000},
+    {n:'FE-4124', c:'Ferretería La 45',           v:920000}
+  ];
+  function vacioHTML(){
+    return '<div class="vb-empty">'+
+      '<div class="msg"><div class="ic">'+
+        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">'+
+        '<path d="M3 6h18l-2 12H5L3 6Z"/><circle cx="9" cy="21" r="1"/><circle cx="17" cy="21" r="1"/></svg>'+
+      '</div>Toca un artículo de la izquierda<br>para agregarlo a la venta.</div>'+
+      '<div class="t">Últimas facturas de hoy</div>'+
+      ULTIMAS.slice(0,4).map(function(u){
+        return '<div class="ult"><span class="n">'+u.n+'</span>'+
+          '<span class="c">'+u.c+'</span><span class="v">'+money(u.v)+'</span></div>';
+      }).join('')+
+    '</div>';
+  }
+
   $('#btnFact').onclick=function(){
     var sub=venta.reduce(function(a,t){return a+t.p*t.q},0);
     var cli=CLIENTES[cliAct];
@@ -562,6 +594,7 @@ tbody tr:hover{background:var(--card2)}
       if(a) a.s=Math.max(0, a.s-t.q);
     });
     nFact++;
+    ULTIMAS.unshift({n:'FE-'+nFact, c:cli.n, v:tot});
     venta=[]; pintarVenta(); pintarLista(); pintarInv(); pintarWeb();
     aviso('Factura FE-'+nFact+' generada', money(tot)+' · '+cli.n+' · stock descontado');
   };

@@ -131,7 +131,20 @@ tbody tr:hover{background:var(--card2)}
 .ticket-h{padding:15px 17px;border-bottom:1px solid var(--linea);display:flex;align-items:center;gap:9px}
 .ticket-h .t{font-family:'Outfit';font-weight:600;font-size:14px}
 .ticket-h .n{margin-left:auto;font-size:11.5px;color:var(--gris)}
-.ticket-items{flex:1;overflow-y:auto;padding:6px 0;min-height:80px}
+.ticket-items{flex:1;overflow-y:auto;padding:6px 0;min-height:80px;display:flex;flex-direction:column}
+.tk-empty{flex:1;display:flex;flex-direction:column;padding:20px 17px}
+.tk-empty .msg{text-align:center;color:var(--gris);font-size:12.8px;line-height:1.6;padding:14px 0 22px}
+.tk-empty .msg .ic{width:44px;height:44px;border-radius:12px;background:var(--card2);
+  border:1px solid var(--linea);display:flex;align-items:center;justify-content:center;
+  margin:0 auto 13px;color:var(--gris)}
+.tk-empty .t{font-size:9.5px;letter-spacing:2px;text-transform:uppercase;color:var(--gris);
+  margin-bottom:10px;padding-top:15px;border-top:1px solid var(--linea2)}
+.ult{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:12.3px;
+  border-bottom:1px solid var(--linea2)}
+.ult:last-child{border-bottom:none}
+.ult .n{font-family:'Outfit';font-weight:600;font-size:11px;color:var(--gris);min-width:44px}
+.ult .c{flex:1;color:var(--gris2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ult .v{font-family:'Outfit';font-weight:600;font-size:12px}
 .ti{display:flex;align-items:center;gap:10px;padding:9px 17px}
 .ti:hover{background:var(--card2)}
 .ti .nm{flex:1;font-size:13px;line-height:1.3}
@@ -479,7 +492,7 @@ tbody tr:hover{background:var(--card2)}
   }
   function pintarTicket(){
     if(!ticket.length){
-      $('#ticketItems').innerHTML='<div class="vacio">Toca un producto<br>para empezar el pedido.</div>';
+      $('#ticketItems').innerHTML=vacioHTML();
       $('#ticketTot').textContent='$0';
       $('#btnCobrar').disabled=true;
       return;
@@ -509,9 +522,30 @@ tbody tr:hover{background:var(--card2)}
     };
   });
 
+  var ULTIMOS=[
+    {n:'#119', c:'Para llevar · 2 items', v:13500},
+    {n:'#118', c:'Mesa 2 · 3 items',      v:19000},
+    {n:'#117', c:'Mesa 6 · 1 item',       v:9000},
+    {n:'#116', c:'Para llevar · 4 items', v:27500}
+  ];
+  function vacioHTML(){
+    return '<div class="tk-empty">'+
+      '<div class="msg"><div class="ic">'+
+        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">'+
+        '<path d="M3 6h18l-2 12H5L3 6Z"/><circle cx="9" cy="21" r="1"/><circle cx="17" cy="21" r="1"/></svg>'+
+      '</div>Toca un producto de la izquierda<br>para empezar el pedido.</div>'+
+      '<div class="t">Últimos pedidos cobrados</div>'+
+      ULTIMOS.slice(0,4).map(function(u){
+        return '<div class="ult"><span class="n">'+u.n+'</span>'+
+          '<span class="c">'+u.c+'</span><span class="v">'+money(u.v)+'</span></div>';
+      }).join('')+
+    '</div>';
+  }
+
   /* ---------- cobrar: mueve inventario, caja y comandas ---------- */
   $('#btnCobrar').onclick=function(){
     var tot=ticket.reduce(function(a,t){return a+t.p*t.q},0);
+    var nItems=ticket.reduce(function(a,t){return a+t.q},0);
     nComanda++; tickets++;
     COMANDAS.unshift({
       id:'#'+nComanda, mesa:$('#ticketN').textContent, st:'cola',
@@ -523,6 +557,7 @@ tbody tr:hover{background:var(--card2)}
       if(ins) ins.s=Math.max(0, +(ins.s-t.q*(ins.u==='kg'?0.02:ins.u==='L'?0.25:1)).toFixed(2));
     });
     VENTAS.filter(function(v){return v.m===pago})[0].v+=tot;
+    ULTIMOS.unshift({n:'#'+nComanda, c:$('#ticketN').textContent+' · '+nItems+' items', v:tot});
     ticket=[]; pintarTicket(); pintarProds();
     pintarComandas(); pintarInv(); pintarCaja();
     var mesa=Math.floor(Math.random()*8)+1;
