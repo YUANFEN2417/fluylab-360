@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agente de agendamiento · Simulador FluyLab</title>
+<meta name="description" content="Simulador de un agente de IA que atiende WhatsApp, agenda citas y actualiza la agenda del negocio en tiempo real. Construido por FluyLab.">
+<link rel="icon" type="image/png" href="../../../assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0908;--bg2:#100E0B;--card:#15130F;--card2:#1B1813;--card3:#232019;
+  --naranja:#D2701F;--naranja-soft:rgba(210,112,31,.14);
+  --crema:#FFF8EC;--gris:#6F6A60;--gris2:rgba(255,248,236,.55);
+  --linea:rgba(255,248,236,.08);--linea2:rgba(255,248,236,.04);
+  --verde:#5F9E6B;--verde-wa:#25D366;--amarillo:#E0A030;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--crema);font-family:'DM Sans',system-ui,sans-serif;
+  font-weight:300;-webkit-font-smoothing:antialiased;overflow:hidden;position:relative;padding-top:32px}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;
+  background:radial-gradient(880px 600px at 78% -12%,rgba(210,112,31,.10),transparent 62%)}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+.app{display:flex;height:calc(100vh - 32px);position:relative;z-index:2}
+
+/* ---------- lateral ---------- */
+.side{width:236px;flex:none;background:var(--bg2);border-right:1px solid var(--linea);
+  display:flex;flex-direction:column;padding:20px 0}
+.brand{display:flex;align-items:center;gap:10px;padding:0 20px 16px;border-bottom:1px solid var(--linea2)}
+.brand .wm{font-family:'Outfit';font-weight:700;font-size:18px;letter-spacing:-.5px}
+.brand .wm b{color:var(--naranja)}
+.biz{padding:15px 20px 4px}
+.biz .eye{font-weight:500;font-size:8.5px;letter-spacing:3px;text-transform:uppercase;color:var(--naranja)}
+.biz .nm{font-family:'Outfit';font-weight:600;font-size:15px;margin-top:3px}
+.estado{margin:16px 14px;padding:12px 14px;background:var(--card);border:1px solid rgba(95,158,107,.3);
+  border-radius:11px}
+.estado .l{display:flex;align-items:center;gap:8px;font-family:'Outfit';font-weight:600;font-size:12.5px}
+.estado i{width:8px;height:8px;border-radius:50%;background:var(--verde);
+  box-shadow:0 0 10px var(--verde);animation:lat 2.2s ease-in-out infinite;font-style:normal}
+@keyframes lat{0%,100%{opacity:1}50%{opacity:.35}}
+.estado p{font-size:11.5px;color:var(--gris);line-height:1.5;margin-top:6px}
+.mini{padding:0 20px;margin-top:auto}
+.mini .t{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gris);margin-bottom:11px}
+.mini .r{display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;
+  border-bottom:1px solid var(--linea2)}
+.mini .r b{font-family:'Outfit';font-weight:600}
+.mini .r:last-child{border-bottom:none}
+
+/* ---------- principal ---------- */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.top{height:60px;flex:none;border-bottom:1px solid var(--linea);display:flex;align-items:center;
+  gap:16px;padding:0 24px;background:rgba(16,14,11,.7);backdrop-filter:blur(12px)}
+.top h1{font-family:'Outfit';font-weight:600;font-size:17px}
+.top .fecha{font-size:12.5px;color:var(--gris2)}
+.tabs{margin-left:auto;display:flex;gap:6px}
+.tab{font-family:'Outfit';font-weight:600;font-size:12.5px;padding:8px 15px;border-radius:99px;
+  border:1px solid var(--linea);background:none;color:var(--gris2);cursor:pointer;transition:.18s}
+.tab:hover{color:var(--crema)}
+.tab.on{background:var(--naranja-soft);border-color:rgba(210,112,31,.45);color:var(--crema)}
+
+.split{flex:1;display:grid;grid-template-columns:396px 1fr;min-height:0}
+@media(max-width:960px){.split{grid-template-columns:1fr}.agenda-col{display:none}}
+
+/* ---------- chat de whatsapp ---------- */
+.chat-col{border-right:1px solid var(--linea);display:flex;flex-direction:column;min-height:0;
+  background:#0D0B09}
+.chat-h{padding:13px 18px;border-bottom:1px solid var(--linea);display:flex;align-items:center;gap:11px;
+  background:var(--card)}
+.chat-h .av{width:36px;height:36px;border-radius:50%;background:rgba(37,211,102,.15);
+  border:1px solid rgba(37,211,102,.35);display:flex;align-items:center;justify-content:center;color:var(--verde-wa)}
+.chat-h .nm{font-family:'Outfit';font-weight:600;font-size:13.5px}
+.chat-h .st{font-size:11px;color:var(--gris)}
+.chat-h .wa{margin-left:auto;font-size:10px;letter-spacing:1.4px;text-transform:uppercase;
+  color:var(--verde-wa);font-family:'Outfit';font-weight:600}
+.chat{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:9px}
+.msg{max-width:80%;padding:10px 13px;border-radius:14px;font-size:13.4px;line-height:1.55;
+  animation:sube .35s cubic-bezier(.16,1,.3,1);word-wrap:break-word}
+@keyframes sube{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+.msg.cli{align-self:flex-end;background:#2A4038;border-bottom-right-radius:4px}
+.msg.bot{align-self:flex-start;background:var(--card2);border:1px solid var(--linea);
+  border-bottom-left-radius:4px}
+.msg .hr{display:block;font-size:10px;color:var(--gris);margin-top:5px;text-align:right}
+.msg.bot .hr{text-align:left}
+.escribiendo{align-self:flex-start;background:var(--card2);border:1px solid var(--linea);
+  border-radius:14px;border-bottom-left-radius:4px;padding:12px 15px;display:flex;gap:5px}
+.escribiendo i{width:6px;height:6px;border-radius:50%;background:var(--gris);
+  animation:pt 1.3s ease-in-out infinite;font-style:normal}
+.escribiendo i:nth-child(2){animation-delay:.2s}
+.escribiendo i:nth-child(3){animation-delay:.4s}
+@keyframes pt{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+.chat-f{padding:13px 18px;border-top:1px solid var(--linea);background:var(--card);
+  display:flex;gap:9px;align-items:center}
+.chat-f .fake{flex:1;background:var(--bg2);border:1px solid var(--linea);border-radius:99px;
+  padding:10px 16px;font-size:12.5px;color:var(--gris)}
+.chat-f button{width:38px;height:38px;border-radius:50%;background:var(--verde-wa);border:none;
+  color:#0A0908;cursor:pointer;flex:none;display:flex;align-items:center;justify-content:center;
+  transition:.2s}
+.chat-f button:hover{filter:brightness(1.1)}
+.chat-f button:disabled{opacity:.4;cursor:not-allowed}
+
+/* ---------- lo que hace el agente por dentro ---------- */
+.agenda-col{display:flex;flex-direction:column;min-height:0}
+.acciones{padding:16px 20px;border-bottom:1px solid var(--linea);min-height:114px}
+.acciones .t{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gris);margin-bottom:11px}
+.acc{display:flex;align-items:flex-start;gap:10px;padding:7px 0;font-size:12.6px;
+  animation:sube .4s cubic-bezier(.16,1,.3,1)}
+.acc .ic{width:20px;height:20px;border-radius:6px;background:var(--naranja-soft);color:var(--naranja);
+  display:flex;align-items:center;justify-content:center;flex:none;margin-top:1px}
+.acc .tx{color:var(--gris2);line-height:1.5}
+.acc .tx b{color:var(--crema);font-family:'Outfit';font-weight:600}
+.acc.vacio{color:var(--gris);font-size:12.5px;padding:8px 0}
+
+.agenda{flex:1;overflow-y:auto;padding:18px 20px}
+.dia{font-family:'Outfit';font-weight:600;font-size:13px;color:var(--gris2);margin:0 0 12px;
+  display:flex;align-items:center;gap:9px}
+.dia::after{content:'';flex:1;height:1px;background:var(--linea)}
+.slot{display:flex;gap:13px;padding:11px 13px;border-radius:11px;margin-bottom:7px;
+  border:1px solid var(--linea);background:var(--card);transition:.25s}
+.slot.libre{background:none;border-style:dashed;border-color:var(--linea2)}
+.slot.nueva{border-color:rgba(210,112,31,.55);background:var(--naranja-soft);
+  animation:brilla .9s cubic-bezier(.16,1,.3,1)}
+@keyframes brilla{0%{transform:scale(.96);box-shadow:0 0 0 0 rgba(210,112,31,.5)}
+  100%{transform:none;box-shadow:0 0 0 16px rgba(210,112,31,0)}}
+.slot .hr{font-family:'Outfit';font-weight:700;font-size:13px;min-width:62px;flex:none}
+.slot.libre .hr{color:var(--gris);font-weight:500}
+.slot .info{flex:1;min-width:0}
+.slot .nm{font-family:'Outfit';font-weight:600;font-size:13px;margin-bottom:2px}
+.slot .sv{font-size:11.8px;color:var(--gris2)}
+.slot.libre .nm{color:var(--gris);font-weight:400;font-size:12.5px}
+.slot .et{font-size:10px;font-family:'Outfit';font-weight:600;padding:3px 8px;border-radius:99px;
+  align-self:center;flex:none}
+.slot .et.wa{background:rgba(37,211,102,.14);color:var(--verde-wa)}
+.slot .et.man{background:rgba(255,248,236,.07);color:var(--gris)}
+
+/* ---------- otras pestañas ---------- */
+.pane{display:none;padding:22px 24px;overflow-y:auto;flex:1}
+.pane.on{display:block}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:14px;margin-bottom:22px}
+.kpi{background:var(--card);border:1px solid var(--linea);border-radius:13px;padding:17px 18px}
+.kpi .lb{font-size:10.5px;letter-spacing:1.6px;text-transform:uppercase;color:var(--gris);margin-bottom:8px}
+.kpi .vl{font-family:'Outfit';font-weight:700;font-size:25px;letter-spacing:-.6px}
+.kpi .dt{font-size:11.5px;color:var(--gris2);margin-top:5px}
+.kpi .dt b{color:var(--verde);font-weight:600}
+h2.sec{font-family:'Outfit';font-weight:600;font-size:15px;margin-bottom:13px}
+.card{background:var(--card);border:1px solid var(--linea);border-radius:13px;overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-family:'Outfit';font-weight:600;font-size:10.5px;letter-spacing:1.4px;
+  text-transform:uppercase;color:var(--gris);padding:12px 16px;border-bottom:1px solid var(--linea)}
+td{padding:12px 16px;border-bottom:1px solid var(--linea2)}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--card2)}
+.pill{display:inline-flex;font-family:'Outfit';font-weight:600;font-size:10.5px;padding:4px 9px;border-radius:99px}
+.pill.ok{background:rgba(95,158,107,.16);color:var(--verde)}
+.pill.warn{background:rgba(224,160,48,.16);color:var(--amarillo)}
+.pill.wa{background:rgba(37,211,102,.14);color:var(--verde-wa)}
+
+/* ---------- aviso + volver ---------- */
+.demo-flag{position:fixed;top:0;left:0;right:0;z-index:2000;background:#0A0908;
+  border-bottom:1px solid rgba(210,112,31,.35);display:flex;align-items:center;justify-content:center;
+  gap:9px;padding:7px 16px;font-size:12px;color:rgba(255,248,236,.72);text-align:center}
+.demo-flag b{color:var(--naranja);font-weight:600}
+.fluy-back{position:fixed;left:18px;bottom:18px;z-index:2000;display:inline-flex;align-items:center;
+  gap:10px;background:rgba(12,10,9,.88);backdrop-filter:blur(16px);border:1px solid rgba(255,248,236,.16);
+  border-radius:999px;padding:9px 16px 9px 12px;box-shadow:0 14px 40px rgba(0,0,0,.5);
+  text-decoration:none;transition:.28s cubic-bezier(.16,1,.3,1)}
+.fluy-back:hover{transform:translateY(-2px);border-color:rgba(210,112,31,.55)}
+.fluy-back img{height:19px;width:auto;display:block}
+.fluy-back span{font-family:'Outfit';font-weight:600;font-size:12.5px;color:rgba(255,248,236,.9)}
+.fluy-back svg{color:var(--naranja)}
+@media(max-width:620px){.side{display:none}.fluy-back span{display:none}}
+</style>
+</head>
+<body>
+
+<div class="demo-flag"><b>Demostración</b> · Conversación de ejemplo. Agente de agendamiento construido por FluyLab.</div>
+
+<div class="app">
+  <aside class="side">
+    <div class="brand"><div class="wm">Fluy<b>Agenda</b></div></div>
+    <div class="biz">
+      <div class="eye">Atención automática</div>
+      <div class="nm">Barbería Sur</div>
+    </div>
+    <div class="estado">
+      <div class="l"><i></i> Agente activo</div>
+      <p>Contesta WhatsApp las 24 horas, agenda, confirma y cobra el abono.</p>
+    </div>
+    <div class="mini">
+      <div class="t">Hoy</div>
+      <div class="r"><span>Citas agendadas</span><b id="mCitas">6</b></div>
+      <div class="r"><span>Por el agente</span><b id="mAuto">5</b></div>
+      <div class="r"><span>Sin contestar</span><b>0</b></div>
+      <div class="r"><span>Tiempo de respuesta</span><b>4 seg</b></div>
+      <div style="height:20px"></div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="top">
+      <div>
+        <h1>Agente de agendamiento</h1>
+        <div class="fecha">Jueves, 14 de agosto</div>
+      </div>
+      <div class="tabs">
+        <button class="tab on" data-p="vivo">En vivo</button>
+        <button class="tab" data-p="hist">Conversaciones</button>
+        <button class="tab" data-p="rep">Resultados</button>
+      </div>
+    </header>
+
+    <!-- ================= EN VIVO ================= -->
+    <div class="split pane on" id="p-vivo" style="display:grid;padding:0">
+      <!-- chat -->
+      <div class="chat-col">
+        <div class="chat-h">
+          <div class="av"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2Z"/></svg></div>
+          <div>
+            <div class="nm">Camilo Restrepo</div>
+            <div class="st" id="chatSt">en línea</div>
+          </div>
+          <div class="wa">WhatsApp</div>
+        </div>
+        <div class="chat" id="chat"></div>
+        <div class="chat-f">
+          <div class="fake" id="fake">La conversación corre sola…</div>
+          <button id="btnPlay" title="Reiniciar la conversación">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- lo que hace por dentro + agenda -->
+      <div class="agenda-col">
+        <div class="acciones">
+          <div class="t">Lo que el agente hace mientras conversa</div>
+          <div id="acciones"><div class="acc vacio">Esperando el primer mensaje…</div></div>
+        </div>
+        <div class="agenda">
+          <div class="dia">Agenda de hoy</div>
+          <div id="agenda"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= CONVERSACIONES ================= -->
+    <div class="pane" id="p-hist">
+      <div class="kpis">
+        <div class="kpi"><div class="lb">Conversaciones hoy</div><div class="vl">23</div><div class="dt"><b>19</b> resueltas solas</div></div>
+        <div class="kpi"><div class="lb">Pasaron a una persona</div><div class="vl">4</div><div class="dt">casos fuera de lo común</div></div>
+        <div class="kpi"><div class="lb">Fuera de horario</div><div class="vl">9</div><div class="dt">atendidas igual</div></div>
+      </div>
+      <h2 class="sec">Últimas conversaciones</h2>
+      <div class="card">
+        <table>
+          <thead><tr><th>Cliente</th><th>Hora</th><th>Pidió</th><th>Cómo terminó</th></tr></thead>
+          <tbody>
+            <tr><td>Camilo Restrepo</td><td>9:12 a.m.</td><td>Corte + barba</td><td><span class="pill ok">Agendó solo</span></td></tr>
+            <tr><td>Andrés Gil</td><td>8:47 a.m.</td><td>Cambiar la hora</td><td><span class="pill ok">Reagendó solo</span></td></tr>
+            <tr><td>Sofía Márquez</td><td>7:20 a.m.</td><td>Precio de tinturado</td><td><span class="pill ok">Respondió y agendó</span></td></tr>
+            <tr><td>Julián Peña</td><td>2:14 a.m.</td><td>Disponibilidad sábado</td><td><span class="pill ok">Agendó solo</span></td></tr>
+            <tr><td>Marta Ovalle</td><td>11:58 p.m.</td><td>Reclamo por un servicio</td><td><span class="pill warn">Pasó al dueño</span></td></tr>
+            <tr><td>Diego Ramos</td><td>10:31 p.m.</td><td>Corte para 3 personas</td><td><span class="pill warn">Pasó al dueño</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ================= RESULTADOS ================= -->
+    <div class="pane" id="p-rep">
+      <div class="kpis">
+        <div class="kpi"><div class="lb">Citas este mes</div><div class="vl">248</div><div class="dt"><b>+18%</b> vs. mes anterior</div></div>
+        <div class="kpi"><div class="lb">Agendadas sin nadie</div><div class="vl">83%</div><div class="dt">206 de 248</div></div>
+        <div class="kpi"><div class="lb">Fuera de horario</div><div class="vl">61</div><div class="dt">se habrían perdido antes</div></div>
+        <div class="kpi"><div class="lb">No se presentaron</div><div class="vl">4,2%</div><div class="dt">antes era 17% sin recordatorio</div></div>
+      </div>
+      <h2 class="sec">A qué hora escribe la gente</h2>
+      <div class="card" style="padding:20px">
+        <div style="display:flex;align-items:flex-end;gap:10px;height:150px" id="chartHoras"></div>
+      </div>
+      <p style="font-size:12.8px;color:var(--gris);line-height:1.6;margin-top:16px;max-width:66ch">
+        Casi la cuarta parte de los mensajes llegan cuando el negocio está cerrado. Sin el agente, esas
+        conversaciones esperaban al día siguiente y buena parte no volvía.
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<a href="../../../index.html" class="fluy-back" aria-label="Volver al sitio de FluyLab">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+  <img src="../../../assets/fluylab-logo-claro.png" alt="FluyLab">
+  <span>Volver</span>
+</a>
+
+<script>
+(function(){
+  var $=function(s){return document.querySelector(s)};
+
+  /* ---------- agenda base del dia ---------- */
+  var AGENDA=[
+    {h:'8:00 a.m.',  n:'Andrés Gil',       s:'Corte clásico',        v:'wa'},
+    {h:'9:00 a.m.',  n:'Sofía Márquez',    s:'Tinturado',            v:'wa'},
+    {h:'10:00 a.m.', n:'Julián Peña',      s:'Corte + barba',        v:'wa'},
+    {h:'11:00 a.m.', libre:true},
+    {h:'12:00 m.',   n:'Almuerzo',         s:'Bloqueado',            v:'man'},
+    {h:'2:00 p.m.',  n:'Diego Ramos',      s:'Corte clásico',        v:'man'},
+    {h:'3:00 p.m.',  libre:true},
+    {h:'4:00 p.m.',  n:'Valeria Cruz',     s:'Corte + cejas',        v:'wa'},
+    {h:'5:00 p.m.',  libre:true}
+  ];
+
+  /* ---------- el guion de la conversacion ---------- */
+  var GUION=[
+    {de:'cli', t:'Buenas, tienen campo hoy para corte y barba?'},
+    {de:'bot', t:'¡Hola! Sí señor 💈 Hoy me quedan libres las 11:00 a.m., las 3:00 p.m. y las 5:00 p.m. ¿Cuál le sirve?',
+     acc:{ic:'📅', t:'Consultó la <b>agenda real</b> y ofreció solo las horas libres'}},
+    {de:'cli', t:'A las 3 está bien'},
+    {de:'bot', t:'Perfecto. Corte + barba son 45 minutos, $45.000 en total. ¿Me confirma su nombre para dejarla apartada?',
+     acc:{ic:'💲', t:'Tomó el precio del <b>servicio configurado</b>, no lo inventó'}},
+    {de:'cli', t:'Camilo Restrepo'},
+    {de:'bot', t:'Listo Camilo ✅ Le aparté hoy jueves 14 a las 3:00 p.m. con Jhon. Le llega un recordatorio mañana… digo, dos horas antes 😄',
+     acc:{ic:'✓', t:'<b>Creó la cita</b> y asignó al barbero con el espacio libre', nueva:'3:00 p.m.', datos:{n:'Camilo Restrepo',s:'Corte + barba',v:'wa'}}},
+    {de:'bot', t:'Si le sale algo y necesita moverla, me escribe por aquí y se la cambio sin problema.',
+     acc:{ic:'🔔', t:'Programó el <b>recordatorio</b> para las 1:00 p.m.'}},
+    {de:'cli', t:'Muchas gracias!'},
+    {de:'bot', t:'Con gusto 🙌 Nos vemos a las 3.',
+     acc:{ic:'📊', t:'Guardó a Camilo en la <b>base de clientes</b> con su historial'}}
+  ];
+
+  /* ---------- pintar agenda ---------- */
+  function pintarAgenda(nuevaHora){
+    $('#agenda').innerHTML=AGENDA.map(function(s){
+      if(s.libre) return '<div class="slot libre"><div class="hr">'+s.h+'</div>'+
+        '<div class="info"><div class="nm">Disponible</div></div></div>';
+      var nueva = s.h===nuevaHora ? ' nueva' : '';
+      return '<div class="slot'+nueva+'"><div class="hr">'+s.h+'</div>'+
+        '<div class="info"><div class="nm">'+s.n+'</div><div class="sv">'+s.s+'</div></div>'+
+        '<div class="et '+(s.v==='wa'?'wa':'man')+'">'+(s.v==='wa'?'Agente':'Manual')+'</div></div>';
+    }).join('');
+  }
+
+  /* ---------- la conversacion ---------- */
+  var i=0, timers=[];
+  function limpiar(){ timers.forEach(clearTimeout); timers=[]; }
+  function reiniciar(){
+    limpiar(); i=0;
+    $('#chat').innerHTML='';
+    $('#acciones').innerHTML='<div class="acc vacio">Esperando el primer mensaje…</div>';
+    AGENDA.forEach(function(s,k){ if(s.h==='3:00 p.m.' && s.n==='Camilo Restrepo') AGENDA[k]={h:'3:00 p.m.',libre:true}; });
+    $('#mCitas').textContent='6'; $('#mAuto').textContent='5';
+    pintarAgenda();
+    correr();
+  }
+  function hora(){ return new Date().toLocaleTimeString('es-CO',{hour:'numeric',minute:'2-digit'}); }
+
+  function correr(){
+    if(i>=GUION.length){ $('#chatSt').textContent='en línea'; return; }
+    var m=GUION[i];
+    if(m.de==='bot'){
+      $('#chatSt').textContent='escribiendo…';
+      var esc=document.createElement('div');
+      esc.className='escribiendo'; esc.innerHTML='<i></i><i></i><i></i>';
+      $('#chat').appendChild(esc); $('#chat').scrollTop=1e9;
+      timers.push(setTimeout(function(){
+        esc.remove(); $('#chatSt').textContent='en línea';
+        soltar(m); i++; timers.push(setTimeout(correr, 1500));
+      }, 1100 + m.t.length*9));
+    } else {
+      timers.push(setTimeout(function(){
+        soltar(m); i++; timers.push(setTimeout(correr, 700));
+      }, 500));
+    }
+  }
+  function soltar(m){
+    var d=document.createElement('div');
+    d.className='msg '+m.de;
+    d.innerHTML=m.t+'<span class="hr">'+hora()+'</span>';
+    $('#chat').appendChild(d); $('#chat').scrollTop=1e9;
+
+    if(m.acc){
+      if($('#acciones').querySelector('.vacio')) $('#acciones').innerHTML='';
+      var a=document.createElement('div');
+      a.className='acc';
+      a.innerHTML='<div class="ic">'+m.acc.ic+'</div><div class="tx">'+m.acc.t+'</div>';
+      $('#acciones').appendChild(a);
+      var caja=$('#acciones');
+      while(caja.children.length>3) caja.removeChild(caja.firstChild);
+
+      if(m.acc.nueva){
+        AGENDA.forEach(function(s,k){
+          if(s.h===m.acc.nueva) AGENDA[k]=Object.assign({h:s.h}, m.acc.datos);
+        });
+        pintarAgenda(m.acc.nueva);
+        $('#mCitas').textContent='7'; $('#mAuto').textContent='6';
+      }
+    }
+  }
+
+  /* ---------- pestañas ---------- */
+  document.querySelectorAll('.tab').forEach(function(b){
+    b.onclick=function(){
+      document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('on')});
+      document.querySelectorAll('.pane').forEach(function(x){
+        x.classList.remove('on'); x.style.display='none';
+      });
+      b.classList.add('on');
+      var p=$('#p-'+b.dataset.p);
+      p.classList.add('on');
+      p.style.display = b.dataset.p==='vivo' ? 'grid' : 'block';
+      if(b.dataset.p==='rep') pintarHoras();
+    };
+  });
+
+  /* ---------- grafico de horas ---------- */
+  var HORAS=[['6a',12],['9a',68],['12m',44],['3p',58],['6p',82],['9p',54],['12a',28]];
+  function pintarHoras(){
+    $('#chartHoras').innerHTML=HORAS.map(function(h,k){
+      var noche = k>=4;
+      return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%;justify-content:flex-end">'+
+        '<div style="width:100%;height:0;border-radius:6px 6px 0 0;transition:height 1s cubic-bezier(.16,1,.3,1);'+
+        'background:'+(noche?'linear-gradient(180deg,var(--naranja),rgba(210,112,31,.3))':'linear-gradient(180deg,rgba(210,112,31,.45),rgba(210,112,31,.12))')+'"></div>'+
+        '<div style="font-size:11px;color:var(--gris);font-family:Outfit;font-weight:500">'+h[0]+'</div></div>';
+    }).join('');
+    setTimeout(function(){
+      $('#chartHoras').querySelectorAll('div > div:first-child').forEach(function(b,k){
+        b.style.height=HORAS[k][1]+'%';
+      });
+    },60);
+  }
+
+  $('#btnPlay').onclick=reiniciar;
+  pintarAgenda();
+  timers.push(setTimeout(correr, 700));
+})();
+</script>
+</body>
+</html>
